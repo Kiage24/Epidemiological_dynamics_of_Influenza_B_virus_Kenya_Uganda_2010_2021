@@ -1,2 +1,4 @@
 # Msc_project
-Inferring Influenza B transmission dynamics in Africa
+Inferring Influenza B virus transmission dynamics in Africa pre and during COVID-19 pandemic
+
+Influenza A viruses (IAV) and influenza B viruses (IBV) are among the most common causes of upper and lower respiratory infections in humans. According to the World Health Organization (WHO), influenza causes approximately 3 to 5 million cases of severe illness and 290,000 to 650,000 deaths annually. Children aged ≤5 years, pregnant women, immunocompromised individuals, and the elderly have the highest disease burden. IBV are classified into two antigenically and genetically distinct lineages namely, B/Yamagata/16/88-like and B/Victoria/2/87-like which co-circulate globally with variable predominance. However, a decline in the circulation of IBV lineages has been observed globally during the COVID-19 pandemic period. Tracking the transmission and evolutionary dynamics of IBV pre- and during COVID-19 will provide information on the effect of behavioral restrictions on IBV transmission as well as regional IBV circulation patterns.
