@@ -1,0 +1,54 @@
+May-08 09:56:57.523 [main] DEBUG nextflow.cli.Launcher - $> nextflow denovo_assembly.nf
+May-08 09:56:57.966 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 23.04.0
+May-08 09:56:58.043 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/Users/bkiage/.nextflow/plugins; core-plugins: nf-amazon@1.16.1,nf-azure@1.0.0,nf-codecommit@0.1.3,nf-console@1.0.5,nf-ga4gh@1.0.4,nf-google@1.7.2,nf-tower@1.5.11,nf-wave@0.8.1
+May-08 09:56:58.065 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+May-08 09:56:58.066 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+May-08 09:56:58.090 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+May-08 09:56:58.113 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+May-08 09:56:58.270 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declararion
+May-08 09:56:58.300 [main] INFO  nextflow.cli.CmdRun - Launching `denovo_assembly.nf` [maniac_leavitt] DSL2 - revision: 84cdc45b59
+May-08 09:56:58.301 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+May-08 09:56:58.302 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+May-08 09:56:58.330 [main] DEBUG nextflow.secret.LocalSecretsProvider - Secrets store: /Users/bkiage/.nextflow/secrets/store.json
+May-08 09:56:58.349 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@1ee29c84] - activable => nextflow.secret.LocalSecretsProvider@1ee29c84
+May-08 09:56:58.435 [main] DEBUG nextflow.Session - Session UUID: 30ef26bd-b736-4aa3-a838-563f0c887f74
+May-08 09:56:58.435 [main] DEBUG nextflow.Session - Run name: maniac_leavitt
+May-08 09:56:58.438 [main] DEBUG nextflow.Session - Executor pool size: 4
+May-08 09:56:58.455 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=12; workQueue=LinkedBlockingQueue[10000]; allowCoreThreadTimeout=false
+May-08 09:56:58.492 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 23.04.0 build 5857
+  Created: 01-04-2023 21:09 UTC (02-04-2023 00:09 EAST)
+  System: Mac OS X 12.6.2
+  Runtime: Groovy 3.0.16 on Java HotSpot(TM) 64-Bit Server VM 17.0.7+8-LTS-224
+  Encoding: UTF-8 (UTF-8)
+  Process: 73247@KEKLF-LT1126-L.local [127.0.0.1]
+  CPUs: 4 - Mem: 16 GB (262.1 MB) - Swap: 3 GB (999.5 MB)
+May-08 09:56:58.516 [main] DEBUG nextflow.Session - Work-dir: /Users/bkiage/Desktop/Msc/scripts/work [Mac OS X]
+May-08 09:56:58.516 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /Users/bkiage/Desktop/Msc/scripts/bin
+May-08 09:56:58.531 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+May-08 09:56:58.545 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+May-08 09:56:58.567 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+May-08 09:56:58.578 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 5; maxThreads: 1000
+May-08 09:56:58.665 [main] DEBUG nextflow.Session - Session start
+May-08 09:57:00.700 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+May-08 09:57:00.900 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+May-08 09:57:00.901 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+May-08 09:57:00.907 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+May-08 09:57:00.913 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=4; memory=16 GB; capacity=4; pollInterval=100ms; dumpInterval=5m
+May-08 09:57:01.051 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: adapter_trim, checkqual
+May-08 09:57:01.051 [main] DEBUG nextflow.Session - Igniting dataflow network (3)
+May-08 09:57:01.057 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > checkqual
+May-08 09:57:01.057 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+May-08 09:57:01.058 [main] DEBUG nextflow.Session - Session await
+May-08 09:57:01.059 [PathVisitor-1] DEBUG nextflow.file.PathVisitor - files for syntax: glob; folder: ../data/run4/; pattern: barcode*; options: [type:dir, checkIfExists:true]
+May-08 09:57:01.208 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+May-08 09:57:01.211 [Task submitter] INFO  nextflow.Session - [6b/139abd] Submitted process > checkqual (1)
+May-08 10:00:45.077 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: checkqual (1); status: COMPLETED; exit: 0; error: -; workDir: /Users/bkiage/Desktop/Msc/scripts/work/6b/139abd871f29e4d7c69fff826be22a]
+May-08 10:00:45.123 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'PublishDir' minSize=10; maxSize=12; workQueue=LinkedBlockingQueue[10000]; allowCoreThreadTimeout=false
+May-08 10:00:45.129 [main] DEBUG nextflow.Session - Session await > all processes finished
+May-08 10:00:45.132 [main] DEBUG nextflow.Session - Session await > all barriers passed
+May-08 10:00:45.150 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'PublishDir' shutdown completed (hard=false)
+May-08 10:00:45.160 [main] DEBUG nextflow.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=1; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=3m 44s; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=1; peakCpus=1; peakMemory=0; ]
+May-08 10:00:45.267 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+May-08 10:00:45.306 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'FileTransfer' shutdown completed (hard=false)
+May-08 10:00:45.307 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

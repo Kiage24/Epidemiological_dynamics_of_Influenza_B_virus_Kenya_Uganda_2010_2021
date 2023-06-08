@@ -1,0 +1,23 @@
+---
+title: "glycosylation"
+author: "Brenda_Kiage"
+date: "2023-05-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r cars}
+
+```
+
+
+
+```{r pressure, echo=FALSE}
+
+```
+
+

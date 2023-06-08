@@ -1,0 +1,27 @@
+{
+    "id": "418032CB",
+    "path": "~/Desktop/Msc/scripts/IBV-R/mutations.Rmd",
+    "project_path": null,
+    "type": "r_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": true,
+    "created": 1685452385309.0,
+    "source_on_save": false,
+    "relative_order": 12,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "119,0",
+        "scrollLine": "93",
+        "last_setup_crc32": "17b07411bb338d19"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1685342924,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1686055983419,
+    "read_only": false,
+    "read_only_alternatives": []
+}

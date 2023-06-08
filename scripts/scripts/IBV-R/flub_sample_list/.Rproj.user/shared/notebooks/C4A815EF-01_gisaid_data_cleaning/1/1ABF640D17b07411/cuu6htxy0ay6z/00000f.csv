@@ -1,0 +1,2 @@
+"0","vic_gisaid_data <- readDNAStringSet(""~/Desktop/Msc/data/gisaid/victoria_complete.fa"")"
+"0","yam_gisaid_data <- readDNAStringSet(""~/Desktop/Msc/data/gisaid/yamagata_complete.fa"")"

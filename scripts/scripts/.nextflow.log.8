@@ -1,0 +1,107 @@
+Apr-13 10:35:02.751 [main] DEBUG nextflow.cli.Launcher - $> nextflow denovo_assembly.nf
+Apr-13 10:35:04.700 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 23.04.0
+Apr-13 10:35:04.767 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/Users/bkiage/.nextflow/plugins; core-plugins: nf-amazon@1.16.1,nf-azure@1.0.0,nf-codecommit@0.1.3,nf-console@1.0.5,nf-ga4gh@1.0.4,nf-google@1.7.2,nf-tower@1.5.11,nf-wave@0.8.1
+Apr-13 10:35:04.805 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Apr-13 10:35:05.073 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Apr-13 10:35:05.080 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+Apr-13 10:35:05.242 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Apr-13 10:35:06.100 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declararion
+Apr-13 10:35:06.158 [main] INFO  nextflow.cli.CmdRun - Launching `denovo_assembly.nf` [furious_morse] DSL2 - revision: 0398ea069e
+Apr-13 10:35:06.171 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Apr-13 10:35:06.180 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+Apr-13 10:35:06.577 [main] DEBUG nextflow.secret.LocalSecretsProvider - Secrets store: /Users/bkiage/.nextflow/secrets/store.json
+Apr-13 10:35:06.594 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@6a0ac48e] - activable => nextflow.secret.LocalSecretsProvider@6a0ac48e
+Apr-13 10:35:07.782 [main] DEBUG nextflow.Session - Session UUID: c5b812cc-c53f-40e3-9373-7d9ce7400436
+Apr-13 10:35:07.782 [main] DEBUG nextflow.Session - Run name: furious_morse
+Apr-13 10:35:07.784 [main] DEBUG nextflow.Session - Executor pool size: 4
+Apr-13 10:35:07.805 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=12; workQueue=LinkedBlockingQueue[10000]; allowCoreThreadTimeout=false
+Apr-13 10:35:08.579 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 23.04.0 build 5857
+  Created: 01-04-2023 21:09 UTC (02-04-2023 00:09 EAST)
+  System: Mac OS X 12.6.2
+  Runtime: Groovy 3.0.16 on OpenJDK 64-Bit Server VM 11.0.18+0
+  Encoding: UTF-8 (UTF-8)
+  Process: 44913@KEKLF-LT1126-L.local [127.0.0.1]
+  CPUs: 4 - Mem: 16 GB (367.4 MB) - Swap: 2 GB (1.2 GB)
+Apr-13 10:35:09.449 [main] DEBUG nextflow.Session - Work-dir: /Users/bkiage/Desktop/Msc/scripts/work [Mac OS X]
+Apr-13 10:35:09.449 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /Users/bkiage/Desktop/Msc/scripts/bin
+Apr-13 10:35:09.476 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Apr-13 10:35:09.504 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Apr-13 10:35:09.577 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Apr-13 10:35:09.893 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 5; maxThreads: 1000
+Apr-13 10:35:11.359 [main] DEBUG nextflow.Session - Session start
+Apr-13 10:35:24.312 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Apr-13 10:35:26.479 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Apr-13 10:35:26.479 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Apr-13 10:35:26.498 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Apr-13 10:35:26.506 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=4; memory=16 GB; capacity=4; pollInterval=100ms; dumpInterval=5m
+Apr-13 10:35:27.702 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: adapter_trim, checkqual, assembly
+Apr-13 10:35:27.703 [main] DEBUG nextflow.Session - Igniting dataflow network (3)
+Apr-13 10:35:28.144 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > adapter_trim
+Apr-13 10:35:28.145 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Apr-13 10:35:28.146 [main] DEBUG nextflow.Session - Session await
+Apr-13 10:35:28.148 [PathVisitor-1] DEBUG nextflow.file.PathVisitor - files for syntax: glob; folder: ../data/run2/fastqs_repeat/; pattern: barcode*; options: [type:dir, checkIfExists:true]
+Apr-13 10:35:29.528 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-13 10:35:29.557 [Task submitter] INFO  nextflow.Session - [4d/322c0c] Submitted process > adapter_trim (3)
+Apr-13 10:35:30.361 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-13 10:35:30.362 [Task submitter] INFO  nextflow.Session - [27/17a922] Submitted process > adapter_trim (4)
+Apr-13 10:35:30.388 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-13 10:35:30.388 [Task submitter] INFO  nextflow.Session - [8d/8d2635] Submitted process > adapter_trim (1)
+Apr-13 10:35:30.402 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-13 10:35:30.403 [Task submitter] INFO  nextflow.Session - [a4/51838f] Submitted process > adapter_trim (2)
+Apr-13 10:35:31.531 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 3; name: adapter_trim (3); status: COMPLETED; exit: 127; error: -; workDir: /Users/bkiage/Desktop/Msc/scripts/work/4d/322c0c73f8da92d8b2b90787a51888]
+Apr-13 10:35:31.537 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-13 10:35:31.538 [Task submitter] INFO  nextflow.Session - [de/f79d7e] Submitted process > adapter_trim (7)
+Apr-13 10:35:31.545 [Task monitor] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=adapter_trim (3); work-dir=/Users/bkiage/Desktop/Msc/scripts/work/4d/322c0c73f8da92d8b2b90787a51888
+  error [nextflow.exception.ProcessFailedException]: Process `adapter_trim (3)` terminated with an error exit status (127)
+Apr-13 10:35:32.015 [Task monitor] ERROR nextflow.processor.TaskProcessor - Error executing process > 'adapter_trim (3)'
+
+Caused by:
+  Process `adapter_trim (3)` terminated with an error exit status (127)
+
+Command executed:
+
+  porechop -i barcode27 -o "barcode27_trimmed.fastq"
+
+Command exit status:
+  127
+
+Command output:
+  (empty)
+
+Command error:
+  .command.sh: line 2: porechop: command not found
+
+Work dir:
+  /Users/bkiage/Desktop/Msc/scripts/work/4d/322c0c73f8da92d8b2b90787a51888
+
+Tip: view the complete command output by changing to the process work dir and entering the command `cat .command.out`
+Apr-13 10:35:32.036 [Task monitor] DEBUG nextflow.Session - Session aborted -- Cause: Process `adapter_trim (3)` terminated with an error exit status (127)
+Apr-13 10:35:32.080 [main] DEBUG nextflow.Session - Session await > all processes finished
+Apr-13 10:35:32.080 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Apr-13 10:35:32.088 [main] WARN  n.processor.TaskPollingMonitor - Killing running tasks (4)
+Apr-13 10:35:32.361 [main] DEBUG n.executor.local.LocalTaskHandler - Unable to kill adapter_trim (4) -- command: kill -TERM 44993; exit: 1 
+ bash: line 0: kill: (44993) - No such process
+
+Apr-13 10:35:32.365 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 4; name: adapter_trim (4); status: COMPLETED; exit: 127; error: -; workDir: /Users/bkiage/Desktop/Msc/scripts/work/27/17a922de3eacf7d672ab77f0f35c0b]
+Apr-13 10:35:32.366 [Task monitor] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=adapter_trim (4); work-dir=/Users/bkiage/Desktop/Msc/scripts/work/27/17a922de3eacf7d672ab77f0f35c0b
+  error [nextflow.exception.ProcessFailedException]: Process `adapter_trim (4)` terminated with an error exit status (127)
+Apr-13 10:35:32.747 [main] DEBUG n.executor.local.LocalTaskHandler - Unable to kill adapter_trim (1) -- command: kill -TERM 44994; exit: 1 
+ bash: line 0: kill: (44994) - No such process
+
+Apr-13 10:35:32.760 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: adapter_trim (1); status: COMPLETED; exit: 127; error: -; workDir: /Users/bkiage/Desktop/Msc/scripts/work/8d/8d2635801537f338d88cc7de74c093]
+Apr-13 10:35:32.761 [Task monitor] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=adapter_trim (1); work-dir=/Users/bkiage/Desktop/Msc/scripts/work/8d/8d2635801537f338d88cc7de74c093
+  error [nextflow.exception.ProcessFailedException]: Process `adapter_trim (1)` terminated with an error exit status (127)
+Apr-13 10:35:33.494 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: adapter_trim (2); status: COMPLETED; exit: 127; error: -; workDir: /Users/bkiage/Desktop/Msc/scripts/work/a4/51838f34d9a2b9a8f9bc1f816cdbc0]
+Apr-13 10:35:33.494 [Task monitor] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=adapter_trim (2); work-dir=/Users/bkiage/Desktop/Msc/scripts/work/a4/51838f34d9a2b9a8f9bc1f816cdbc0
+  error [nextflow.exception.ProcessFailedException]: Process `adapter_trim (2)` terminated with an error exit status (127)
+Apr-13 10:35:33.877 [main] DEBUG n.executor.local.LocalTaskHandler - Unable to kill adapter_trim (2) -- command: kill -TERM 44996; exit: 1 
+ bash: line 0: kill: (44996) - No such process
+
+Apr-13 10:35:33.899 [main] DEBUG nextflow.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=0; failedCount=6; ignoredCount=0; cachedCount=0; pendingCount=13; submittedCount=1; runningCount=-4; retriesCount=0; abortedCount=2; succeedDuration=0ms; failedDuration=13.4s; cachedDuration=0ms;loadCpus=-4; loadMemory=0; peakRunning=4; peakCpus=4; peakMemory=0; ]
+Apr-13 10:35:33.908 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Apr-13 10:35:34.250 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

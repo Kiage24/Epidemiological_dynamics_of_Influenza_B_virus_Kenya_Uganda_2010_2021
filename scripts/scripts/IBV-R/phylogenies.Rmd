@@ -1,0 +1,314 @@
+---
+title: "segment_by_segment_trees"
+author: "Brenda_Kiage"
+date: "2023-05-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+
+
+```{r load the required libraries}
+library(ggtree)
+
+library(ape)
+
+library(ggplot2)
+
+library(dplyr)
+
+library(tidyr)
+
+library(phylotools)
+
+library(dendextend)
+
+library(phangorn)
+
+library(dplyr)
+
+library(treeio)
+
+library(phytools)
+
+library(dendextend)
+
+library(cowplot)
+
+library(ggtreeExtra)
+
+library(castor)
+```
+
+
+
+
+```{r read in the tree and create the metadata file}
+# Read in the tree from file
+HA_tree <- read.tree("~/Desktop/Msc/flub_results/iqtree/HA.treefile")
+
+#Root at midpoint
+HA_tree <- root_at_midpoint(HA_tree)
+
+#Read in locations metadata
+locations <- read.csv("~/Desktop/Msc/flub_results/genotyping/phylogeny/locations.csv", header = F)
+colnames(locations) <- c("tip_label", "location")
+
+```
+
+
+
+```{r plot the tree}
+
+
+HA_treeplot <- ggtree(HA_tree, size = 0.3) %<+% locations +
+
+               geom_tiplab(size = 2,  aes(color = location)) +
+  
+              scale_color_manual(name = "Location",
+                                  values = c("KCH" = "blue", "Matsangoni" = "red2", "Mavueni"= "darkorchid3", "Mtondia" =                                           "darkgreen", "Pingilikani" = "coral4", "Jinja" = "orchid4", "Soroti" = "maroon3", "Mbale" = "orange"),
+                                  na.value = "black") +
+  
+              geom_cladelabel(node=114, label="Victoria", offset = .025) +
+              geom_cladelabel(node=115, label="Yamagata", offset = .025) +
+              geom_cladelabel(node=3, label="Y1", offset = .0455) +
+              geom_cladelabel(node=117, label="Y2", offset = .036) +
+              geom_cladelabel(node=122, label="Y3", offset = .02) +
+              geom_cladelabel(node=1, label="V1B", offset = .043) +
+              #geom_cladelabel(node=93, label="V1A", offset = .049) +
+              geom_cladelabel(node=223, label="V1A", offset = .02) +
+              geom_cladelabel(node=210, label="V1A.1", offset = .028) +
+              geom_cladelabel(node=105, label="V1A.2", offset = .028) +
+              geom_cladelabel(node=149, label="V1A.3", offset = .024) +
+              geom_cladelabel(node=215, label="V1A.3a.1", offset = .022) +
+              geom_cladelabel(node=156, label="V1A.3a.2", offset = .013) +
+  
+              geom_nodelab(
+                   mapping = aes(
+                   x = branch,
+                   label = label,
+                   subset = !is.na(as.numeric(label)) & as.numeric(label) > 70), size=2, vjust=-0.2) + 
+              
+              ggtitle("HA segment") +
+              
+              #geom_text(aes(label=node), hjust=-.3, size = 3) +
+              
+              theme_classic() +
+              
+              scale_y_continuous(breaks = seq(0, 300, 50)) +
+  
+              theme(panel.grid.major = element_line(colour = "grey", linetype = "dashed", linewidth = 0.2), 
+                    plot.title = element_text(      
+                    size = 12,
+                    face = "bold",
+                    hjust = 0.5),  
+                    legend.position = "none") 
+
+HA_treeplot +  xlim(0, 0.12)
+
+
+
+
+#rm(list=ls())
+
+
+
+
+
+```
+
+
+
+```{r}
+
+#Create a metadata file with the year and location column
+metadata <- flub_tree$tip.label
+metadata_df <- as.data.frame(metadata)
+rownames(metadata_df) <- metadata
+
+references <- metadata_df[grepl("B/", metadata_df$metadata), ]
+ref_df <- as.data.frame(references)
+ref_df$references <- gsub("'", "", ref_df$references)
+ref_df <- ref_df %>% separate(references, c("sample_id","Lineage", "segment", "clade", "collection_date"), sep = "\\|")
+#ref_df <- ref_df %>% separate(references, c("sample_id","Lineage", "clade"), sep = "\\|")
+ref_df <- ref_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+#ref_df <- ref_df %>% separate(sample_id, c("subtype", "country", "version" , "year"), sep = "/")
+rownames(ref_df) <- references
+
+samples <- metadata_df[!grepl("B/", metadata_df$metadata), ]
+sample_df <- as.data.frame(samples)
+sample_df$samples <- gsub("'", "", sample_df$samples)
+sample_df <- sample_df %>% separate(samples, c("sample_id", "Location","collection_date"), sep = "\\|")
+sample_df <- sample_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+sample_df$year <- gsub("9/1/2020","2020", sample_df$year)
+sample_df$year <- gsub("11/11/2019","2019", sample_df$year)
+sample_df$year <- gsub("2/11/2021","2021", sample_df$year)
+rownames(sample_df) <- samples
+
+mdata <- bind_rows(ref_df, sample_df)
+mdata <- mdata[rownames(metadata_df), ]
+mdata$label <- rownames(metadata_df)
+mdata$Location <- as.factor(mdata$Location)
+
+```
+
+
+```{r plot the heatmap describing the years}
+
+
+HA_plot <- HA_treeplot + geom_fruit(data=mdata, geom = geom_tile,
+                         mapping = aes(y=label, x=year, fill=Location),
+                         offset=0.08, pwidth=0.5,
+                         axis.params = list(axis="x", hjust=0.5, vjust=0.6,text= mdata$year, text.angle=0, text.size = 2),
+                         grid.params = list()) +
+                         scale_fill_manual(name="Location", values=c("KCH" = "royalblue", "Matsangoni" = "red2", 
+                               "Mavueni"= "darkorchid3", "Mtondia" = "olivedrab4", 
+                               "Pingilikani" = "coral4", "Jinja" = "khaki3", 
+                               "Soroti" = "maroon3", "Mbale" = "orange"), guide = "none")
+
+
+HA_plot
+
+
+
+
+```
+
+
+```{r}
+ggsave("~/Desktop/Msc/plots/HA_mltreeplot.png", plot = HA_plot, dpi = 600, width = 14,height = 7)
+```
+
+
+```{r plot tanglegrams to check for reassortment}
+HA_tree <- read.tree("~/Desktop/Msc/results/IRMA/iqtree_clean/HA_tree1.nwk")
+HA_tree <- read.tree("~/Desktop/Msc/results/IRMA/iqtree_clean/NS_tree1.nwk")
+
+# Convert tree to ultrametric tree
+leaf_distances <- cophenetic(HA_tree)
+node_distances <- node.depth(HA_tree)
+for (i in 1:HA_tree$Nnode) {
+  if (!isTip(HA_tree, i)) {
+    left_child <- HA_tree$edge[i,1]
+    right_child <- HA_tree$edge[i,2]
+    left_length <- leaf_distances[left_child] - node_distances[i]
+    right_length <- leaf_distances[right_child] - node_distances[i]
+    new_length <- mean(c(left_length, right_length))
+    HA_tree$edge[i,3] <- node_distances[i] + new_length
+  }
+}
+
+# Convert tree to ultrametric tree
+leaf_distances <- cophenetic(NS_tree)
+node_distances <- node.depth(NS_tree)
+for (i in 1:NS_tree$Nnode) {
+  if (!isTip(NS_tree, i)) {
+    left_child <- NS_tree$edge[i,1]
+    right_child <- NS_tree$edge[i,2]
+    left_length <- leaf_distances[left_child] - node_distances[i]
+    right_length <- leaf_distances[right_child] - node_distances[i]
+    new_length <- mean(c(left_length, right_length))
+    NS_tree$edge[i,3] <- node_distances[i] + new_length
+  }
+}
+
+# Convert ultrametric tree to hclust object
+HA_tree <- force.ultrametric(HA_tree)
+HA_hclust_tree <- as.hclust.phylo(HA_tree)
+
+
+
+NS_tree <- force.ultrametric(NS_tree)
+NS_hclust_tree <- as.hclust.phylo(NS_tree)
+
+
+
+#Construct the dendogram
+HA_dendro <- as.dendrogram(HA_hclust_tree)
+NS_dendro <- as.dendrogram(NS_hclust_tree)
+
+
+
+
+HANS <- tanglegram(HA_dendro, NS_dendro,
+                   highlight_distinct_edges = FALSE, # Turn-off dashed lines
+                   common_subtrees_color_lines = FALSE, # Turn-off line colors
+                   common_subtrees_color_branches = TRUE,
+                   lwd = 1,
+                   lty = 2,
+                   edge.lwd = 2,
+                   lab.cex = 0.4,
+                   #label_offset = 0.5,
+                   #seg.len = 0.5,
+                   k_branches = 2,
+                   main_left = "HA",
+                   main_right = "NS",
+                   cex_main_left = 2,
+                   cex_main_right = 2
+)
+
+HANS
+
+```
+
+
+```{r generate tsv date files for treetime}
+# Read in the tree from file
+
+NS_tree <- read.tree("~/Desktop/Msc/flub_results/iqtree_ml/NS_tree.nwk")
+NS_tree$tip.label
+
+
+#Create a metadata file with the year and location column
+metadata <- NS_tree$tip.label
+metadata_df <- as.data.frame(metadata)
+rownames(metadata_df) <- metadata
+
+references <- metadata_df[grepl("B/", metadata_df$metadata), ]
+ref_df <- as.data.frame(references)
+ref_df$references <- gsub("'", "", ref_df$references)
+ref_df <- ref_df %>% separate(references, c("sample_id","Lineage", "segment", "clade", "collection_date"), sep = "\\|")
+#ref_df <- ref_df %>% separate(references, c("sample_id","Lineage", "clade"), sep = "\\|")
+ref_df <- ref_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+#ref_df <- ref_df %>% separate(sample_id, c("subtype", "country", "version" , "year"), sep = "/")
+rownames(ref_df) <- references
+
+samples <- metadata_df[!grepl("B/", metadata_df$metadata), ]
+sample_df <- as.data.frame(samples)
+sample_df$samples <- gsub("'", "", sample_df$samples)
+sample_df <- sample_df %>% separate(samples, c("sample_id", "Location","collection_date"), sep = "\\|")
+sample_df <- sample_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+sample_df$year <- gsub("9/1/2020","2020", sample_df$year)
+sample_df$year <- gsub("11/11/2019","2019", sample_df$year)
+sample_df$year <- gsub("2/11/2021","2021", sample_df$year)
+rownames(sample_df) <- samples
+
+mdata <- bind_rows(ref_df, sample_df)
+mdata <- mdata[rownames(metadata_df), ]
+mdata$label <- rownames(metadata_df)
+mdata$Location <- as.factor(mdata$Location)
+mdata$month[is.na(mdata$month)] <- "XX"
+mdata$date[is.na(mdata$date)] <- "XX"
+
+mdata <- mdata %>% unite("collection_date", c(year, month, date), sep = "-")
+dates <- data.frame(mdata$label, mdata$collection_date)
+colnames(dates) <- c("name", "collection_date")
+dates$collection_date <- gsub("2018-1-26", "2018-01-26", dates$collection_date)
+dates$collection_date <- gsub("2020-XX-XX","2020-01-09", dates$collection_date)
+dates$collection_date <- gsub("2019-XX-XX","2019-11-11", dates$collection_date)
+dates$collection_date <- gsub("2021-XX-XX","2021-11-02", dates$collection_date)
+
+dates$name <- gsub("'","", dates$name)
+
+
+
+library(lubridate)
+dates$collection_date <- decimal_date(ymd(dates$collection_date))
+
+write_tsv(dates, "~/Desktop/Msc/flub_results/treetime/NS_metadata.tsv")
+
+```
+
