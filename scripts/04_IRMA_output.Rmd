@@ -1,0 +1,108 @@
+---
+title: "IRMA_segment_output"
+author: "Brenda_Kiage"
+date: "2023-07-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+
+
+```{r read in required libraries}
+
+library(readr)
+library(dplyr)
+library(tidyr)
+library(gridExtra)
+
+```
+
+
+```{r clean and transform the data}
+
+# Read in the csv file containing the segment lengths
+
+IRMA_output <- read.csv("~/Desktop/Msc/flub_results/flub_seglength.csv", header=FALSE, sep=",")
+
+#Clean and transform the dataframe
+
+IRMA_output <- IRMA_output %>% pivot_wider(names_from = V2, values_from = V3)
+
+colnames(IRMA_output) <- c("sample_id", "HA", "MP", "NA.","NP", "NS","PA", "PB1", "PB2") 
+
+IRMA_output <- IRMA_output[,1:9]
+
+IRMA_output$sample_id <- gsub("_trimmed", "", IRMA_output$sample_id)
+
+```
+
+
+```{r compute genome coverage}
+
+
+IRMA_output <- IRMA_output %>% mutate_at(c("HA", "MP", "NA.", "NP","NS","PA","PB1","PB2"), as.numeric) %>% 
+  mutate(genome_length=HA+MP+NA.+NP+NS+PA+PB1+PB2) %>%
+  mutate(genome_coverage=round(genome_length/13700 * 100, 2))
+
+```
+
+
+```{r Compute the number of complete and partial segments}
+
+complete <- IRMA_output %>% filter(genome_coverage >= 99) %>%
+  summarise(count = n())
+
+
+complete70 <- IRMA_output %>% filter(genome_coverage >= (70)) %>%
+                                summarise(count = n()) # Partial genomes will be the difference of complete 
+
+complete <- IRMA_output %>% filter(genome_coverage >= 92) ##what was used for this dataset as complete
+write(complete$sample_id, "~/Desktop/Msc/flub_results/complete.txt")
+
+
+#Save the dataframe for segment lengths to a csv file
+write.csv(IRMA_output, "~/Desktop/Msc/flub_results/IRMA_recovery.csv")
+
+```
+
+
+```{r Plot the recovery for each segment}
+
+#factor the sample ids to mantain their order in the x- axis
+
+IRMA_output$sample_id<- factor(IRMA_output$sample_id, levels=IRMA_output$sample_id)
+
+#Generate the plot using ggplot
+
+segment_plot <-function(dat,seg_title,yintercept,yintercept2,x,y,z,label){
+  ggplot(data=dat, aes(x=x, y=y)) +
+    geom_bar(stat="identity", fill="steelblue", alpha=.6, width=.7) +
+    geom_hline(yintercept = yintercept,linetype='dashed') +
+    annotate("text", x=23, y=0.7 * z, label="70% completeness") +
+    geom_hline(yintercept = yintercept2,linetype='dashed') +
+    annotate("text", x=23, y=z, label="100% completeness") +
+    labs(title= seg_title, x='sample id') +
+    scale_y_continuous(name="segment length (nt)", limits=c(0,2500))+
+    theme(
+      plot.title = element_text(face = "bold", hjust = 0.5, size = 14, color = 'black'),
+      axis.line = element_line(colour = "black"),
+      axis.text.x = element_text(colour = 'black', angle = 90, size = 3),
+      axis.text.y = element_text(colour = 'black'),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.border = element_blank(),
+      panel.background = element_blank(),
+      axis.title.x = element_text(size = 12, face = 'bold'),
+      axis.title.y = element_text(size = 12, face = 'bold'))
+  
+}
+
+pa <- segment_plot(IRMA_output,"PA",(0.7*2182),2182,IRMA_output$sample_id, IRMA_output$PA,2350 )
+pa
+
+grid.arrange(pb1,pb2,np,na, ncol=2,nrow=2)
+```
+
