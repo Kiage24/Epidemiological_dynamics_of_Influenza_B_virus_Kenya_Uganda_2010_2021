@@ -1,0 +1,60 @@
+---
+title: "location_mdata"
+author: "Brenda_Kiage"
+date: "2023-07-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r load the required libraries}
+
+library(readr)
+
+library(Biostrings)
+
+library(dplyr)
+
+library(tidyr)
+
+```
+
+
+```{r read in the alignment file}
+
+genotype_seqs <- read.csv("~/Desktop/flub_msc/results/DOCS/genotype_labels.csv")
+colnames(genotype_seqs) <- c('no','names')
+
+#Extract the locations
+genotype_locations <- genotype_seqs %>% separate(names, c("subtype","location"), sep = "/")
+
+#Bind the two dataframes together
+genotype_seqs <- cbind(genotype_seqs$names, genotype_locations$location)
+colnames(genotype_seqs) <- c('names','location')
+
+write.csv(genotype_seqs, "~/Desktop/flub_msc/results/DOCS/genotype_labels.csv")
+
+```
+
+```{r extract the location metadata}
+
+genotype_seqs <- read.csv("~/Desktop/flub_msc/results/DOCS/genotype_labels.csv")
+colnames(genotype_seqs) <- c('no','names')
+
+#Extract the locations
+genotype_locations <- genotype_seqs %>% separate(names, c("subtype","location"), sep = "/")
+
+#Bind the two dataframes together
+genotype_seqs <- cbind(genotype_seqs$names, genotype_locations$location)
+colnames(genotype_seqs) <- c('names','location')
+
+write.csv(genotype_seqs, "~/Desktop/flub_msc/results/DOCS/IBV_labels.csv")
+
+
+
+```
+

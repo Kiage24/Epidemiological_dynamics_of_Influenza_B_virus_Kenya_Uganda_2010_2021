@@ -1,0 +1,228 @@
+---
+title: "treetime_dates"
+author: "Brenda_Kiage"
+date: "2023-07-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+
+```{r load required libraries}
+
+library(lubridate)
+library(ggtree)
+library(ape)
+```
+
+
+
+```{r Read in the tree from file}
+
+HA_tree <- read.tree("~/Desktop/flub_msc/results/iqtree_genotype/HA.treefile")
+
+
+```
+
+
+```{r Create a metadata file with the year and location column}
+
+labels <- HA_tree$tip.label
+labels_df <- as.data.frame(labels)
+rownames(labels_df) <- labels
+
+
+vic_references <- labels_df[grepl("Victoria", labels_df$labels), ]
+ref_df <- as.data.frame(vic_references)
+ref_df <- ref_df %>% separate(vic_references, c("sample_id","Lineage", "segment", "clade", "collection_date"), sep = "\\|")
+ref_df <- ref_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+rownames(ref_df) <- vic_references
+
+yam_references <- labels_df[grepl("Yamagata", labels_df$labels), ]
+yam_ref_df <- as.data.frame(yam_references)
+yam_ref_df <- yam_ref_df %>% separate(yam_references, c("sample_id","Lineage", "segment", "clade", "collection_date"), sep = "\\|")
+yam_ref_df <- yam_ref_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+rownames(yam_ref_df) <- yam_references
+
+
+samples <- labels_df[!grepl("Yamagata", labels_df$labels), ]
+samples_df <- as.data.frame(samples)
+samples1 <- samples_df[!grepl("Victoria", samples_df$samples), ]
+samples_df <- as.data.frame(samples1)
+samples_df <- samples_df %>% separate(samples1, c("subtype","location", "sample_id", "collection_date"), sep = "/")
+samples_df <- samples_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+rownames(samples_df) <- samples1
+
+metadata <- bind_rows(ref_df, yam_ref_df, samples_df)
+metadata <- metadata[rownames(labels_df), ]
+metadata$label <- rownames(labels_df)
+metadata$location <- as.factor(metadata$location)
+metadata$month[is.na(metadata$month)] <- "XX"
+metadata$date[is.na(metadata$date)] <- "XX"
+
+metadata <- metadata %>% unite("collection_date", c(year, month, date), sep = "-")
+dates <- data.frame(metadata$label, metadata$collection_date)
+colnames(dates) <- c("name", "collection_date")
+
+
+dates$collection_date <- decimal_date(ymd(dates$collection_date))
+
+write_csv(dates, "~/Desktop/flub_msc/results/treetime/HA_treetime_dates.csv")
+
+```
+
+
+
+```{r Create a metadata file with the year and location column}
+
+
+
+labels <- gsub("^Kenya", "Kilifi", labels)
+labels_df <- as.data.frame(labels)
+rownames(labels_df) <- labels
+
+
+references <- labels_df[grepl("^B/", labels_df$labels), ]
+ref_df <- as.data.frame(references)
+ref_df <- ref_df %>% separate(references, c("sample_id","Lineage", "segment", "clade", "collection_date"), sep = "\\|")
+ref_df <- ref_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+rownames(ref_df) <- references
+
+festus <- labels_df[grepl("^Kilifi", labels_df$labels), ]
+festus_df <- as.data.frame(festus)
+festus_df <- festus_df %>% separate(festus, c("location", "virus", "sample_id","collection_date"), sep = "/")
+festus_df <- festus_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+rownames(festus_df) <- festus
+
+fes_samples <- labels_df[!grepl("^B/", labels_df$labels), ]
+fes_samples_df <- as.data.frame(fes_samples)
+samples <- fes_samples_df[!grepl("^Kilifi", fes_samples_df$fes_samples), ]
+sample_df <- as.data.frame(samples)
+sample_df <- sample_df %>% separate(samples, c("location", "virus", "sample_id","collection_date"), sep = "/")
+sample_df <- sample_df %>% separate(collection_date, c("date", "month", "year"), sep = "-")
+rownames(sample_df) <- samples
+
+
+metadata <- bind_rows(ref_df, sample_df, festus_df)
+metadata <- metadata[rownames(labels_df), ]
+metadata$label <- rownames(labels_df)
+metadata$location <- as.factor(metadata$location)
+metadata$month[is.na(metadata$month)] <- "XX"
+metadata$date[is.na(metadata$date)] <- "XX"
+
+metadata <- metadata %>% unite("collection_date", c(year, month, date), sep = "-")
+dates <- data.frame(metadata$label, metadata$collection_date)
+colnames(dates) <- c("name", "collection_date")
+
+```
+
+
+```{r convert the dates into decimal format}
+
+dates$collection_date <- decimal_date(ymd(dates$collection_date))
+
+write_csv(dates, "~/Desktop/flub_msc/results/treetime/NS_treetime_dates.csv")
+
+```
+
+```{r}
+HAgbl_tree <- read.tree("~/Desktop/flub_msc/global/results/iqtree/HA_vicgbl_edit.treefile")
+
+labels <- HAgbl_tree$tip.label
+labels_df <- as.data.frame(labels)
+rownames(labels_df) <- labels
+
+
+vic_references <- labels_df[grepl("Victoria|HA", labels_df$labels), ]
+ref_df <- as.data.frame(vic_references)
+ref_df <- ref_df %>% separate(vic_references, c("sample_id","Lineage", "segment", "clade", "collection_date"), sep = "\\|")
+ref_df <- ref_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+rownames(ref_df) <- vic_references
+ref_df <- drop_na(ref_df)
+
+
+samples1 <- subset(labels_df, !labels %in% rownames(ref_df))
+samples_df <- as.data.frame(samples1)
+samples_df <- samples_df %>% separate(labels, c("subtype","location", "sample_id", "collection_date"), sep = "/")
+samples_df <- samples_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+rownames(samples_df) <- samples1$labels
+
+metadata <- bind_rows(ref_df, samples_df)
+metadata <- metadata[rownames(labels_df), ]
+metadata$label <- rownames(labels_df)
+metadata$location <- as.factor(metadata$location)
+metadata$month[is.na(metadata$month)] <- "XX"
+metadata$date[is.na(metadata$date)] <- "XX"
+
+metadata <- metadata %>% unite("collection_date", c(year, month, date), sep = "-")
+dates <- data.frame(metadata$label, metadata$collection_date)
+colnames(dates) <- c("name", "collection_date")
+
+
+dates$collection_date <- decimal_date(ymd(dates$collection_date))
+
+write_csv(dates, "~/Desktop/flub_msc/global/results/treetime/HA_vicgbl_dates")
+
+
+```
+
+
+```{r}
+
+HAgbl_tree <- read.tree("~/Desktop/flub_msc/global/results/iqtree/HA_yamgbl_edit.treefile")
+
+labels <- HAgbl_tree$tip.label
+labels_df <- as.data.frame(labels)
+rownames(labels_df) <- labels
+
+
+yam_references <- labels_df[grepl("Yamagata|HA", labels_df$labels), ]
+ref_df <- as.data.frame(yam_references)
+ref_df <- ref_df %>% separate(yam_references, c("sample_id","Lineage", "segment", "clade", "collection_date"), sep = "\\|")
+ref_df <- ref_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+rownames(ref_df) <- yam_references
+ref_df <- drop_na(ref_df)
+
+
+samples1 <- subset(labels_df, !labels %in% rownames(ref_df))
+samples_df <- as.data.frame(samples1)
+samples_df <- samples_df %>% separate(labels, c("subtype","location", "sample_id", "collection_date"), sep = "/")
+samples_df <- samples_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+rownames(samples_df) <- samples1$labels
+
+metadata <- bind_rows(ref_df, samples_df)
+metadata <- metadata[rownames(labels_df), ]
+metadata$label <- rownames(labels_df)
+metadata$location <- as.factor(metadata$location)
+metadata$month[is.na(metadata$month)] <- "XX"
+metadata$date[is.na(metadata$date)] <- "XX"
+
+metadata <- metadata %>% unite("collection_date", c(year, month, date), sep = "-")
+dates <- data.frame(metadata$label, metadata$collection_date)
+colnames(dates) <- c("name", "collection_date")
+
+
+dates$collection_date <- decimal_date(ymd(dates$collection_date))
+
+write_csv(dates, "~/Desktop/flub_msc/global/results/treetime/HA_yamgbl_dates")
+
+```
+
+
+```{r remove flagged sequences in treetime}
+
+HAgblvic_tree <- read.tree("~/Desktop/flub_msc/global/results/iqtree/HA_vicgbl.treefile")
+HAgblvic_tree <- drop.tip(HAgblvic_tree, c("B/Belgium/EPI_ISL_2484155/2020-01-07",
+                                     "B/Cambodia/EPI_ISL_222810/2012-12-04",
+                                     "B/Zhejiang-Yiwu/EPI_ISL_2696125/2021-02-01"))
+write.tree(HAgblvic_tree, "~/Desktop/flub_msc/global/results/iqtree/HA_vicgbl_edit.treefile")
+
+
+HAgblyam_tree <- read.tree("~/Desktop/flub_msc/global/results/iqtree/HA_yamgbl.treefile")
+HAgblyam_tree <- drop.tip(HAgblyam_tree, c("B/NIIGATA/EPI_ISL_500499/2020-03-06",
+                                     "B/Singapore/EPI_ISL_240973/2016-10-31"))
+write.tree(HAgblyam_tree, "~/Desktop/flub_msc/global/results/iqtree/HA_yamgbl_edit.treefile")
+```
+

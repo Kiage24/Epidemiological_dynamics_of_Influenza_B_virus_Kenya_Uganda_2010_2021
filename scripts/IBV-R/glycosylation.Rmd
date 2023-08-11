@@ -1,0 +1,288 @@
+---
+title: "glycosylation"
+author: "Brenda_Kiage"
+date: "2023-05-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+
+```{r load required libraries}
+
+library(ggplot2)
+library(gridExtra)
+library(ggpmisc)
+library(dplyr)
+library(readxl)
+```
+
+
+
+```{r  Extract positions from nextclade metadata}
+
+# Read in the nextclade metadata
+
+vic_gly <- read.csv("~/Desktop/flub_msc/results/glycosylation/vic/vic_gly.csv", sep = ";")
+
+#Obtain the names, clade and glycosylated positions
+
+vic_gly <- cbind(vic_gly$seqName, vic_gly$clade, vic_gly$glycosylation)
+vic_gly <- as.data.frame(vic_gly)
+colnames(vic_gly) <- c("seqname", "clade","glycosylation")
+
+#Transform the substitution column to obtain the domain
+
+vic_gly <- separate_rows(vic_gly, glycosylation, sep = ";")
+vic_gly <-vic_gly %>% separate(glycosylation, c("domain", "glyc_pos", "sequon"), sep = ":")
+
+
+```
+
+
+```{r generate a plot for the glycosylation patterns}
+
+vic_gly_HA <- vic_gly %>%
+  group_by(glyc_pos, domain) %>%
+  summarise(counts = n()) %>%
+  mutate(percentages = counts / 167 * 100) %>%
+  mutate(glyc_pos_numeric = as.numeric(glyc_pos)) %>%
+  arrange(glyc_pos_numeric)
+
+vic_gly_HA$glyc_pos_numeric <- ifelse(vic_gly_HA$domain == "HA2", (vic_gly_HA$glyc_pos_numeric + 347), vic_gly_HA$glyc_pos_numeric)
+
+new_column <- data.frame(glyc_pos="563",
+                         domain="HA2",
+                         counts=167,
+                         percentages=100.0000,
+                         glyc_pos_numeric=563)
+vic_gly_HA <- bind_rows(vic_gly_HA, new_column)
+
+
+vic <- ggplot(vic_gly_HA, aes(x=glyc_pos_numeric, y=percentages, fill= domain))+               
+  geom_col(position = "dodge" , width = 1.5) +
+  xlab("potential glycosylation site") +
+  ylab("% of victoria lineage strains") +
+  ggtitle("Victoria lineage N-linked glycosylation") +
+  scale_fill_manual(values=c("tomato3", "cyan4")) +
+  theme_classic() +
+  theme(panel.grid.major = element_blank(),
+    legend.position = "none",
+        legend.title = element_text(size = 14,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 14,
+    face = "bold",
+    hjust = 0.5),
+  axis.text = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.title = element_text(size = 14,
+    face = "bold",
+    colour="black")) +
+  scale_x_continuous(limits = c(0, 571), breaks = seq(0, 571, 50), expand = c(0, 0))
+
+vic
+
+
+
+```
+
+```{r }
+# Read in the nextclade metadata
+
+yam_gly  <- read_excel("~/Desktop/flub_msc/results/glycosylation/yam/yam_glycosylations.xls")
+
+#Obtain the names, clade and glycosylated positions
+
+yam_gly <- cbind(yam_gly$seqname, yam_gly$clade, yam_gly$glycosylation)
+yam_gly <- as.data.frame(yam_gly)
+colnames(yam_gly) <- c("seqname","clade", "glycosylation")
+
+write_csv(yam_gly, "~/Desktop/flub_msc/results/glycosylation/yam/yam_gly_edit.csv")
+
+#Transform the substitution column to obtain the  domain
+
+yam_gly <- separate_rows(yam_gly, glycosylation, sep = ";")
+yam_gly <-yam_gly %>% separate(glycosylation, c("domain", "glyc_pos", "sequon"), sep = ":")
+
+
+```
+
+```{r}
+yam_gly_HA <- yam_gly %>%
+  group_by(glyc_pos, domain) %>%
+  summarise(counts = n()) %>%
+  mutate(percentages = counts / 14 * 100) %>%
+  mutate(glyc_pos_numeric = as.numeric(glyc_pos)) %>%
+  arrange(glyc_pos_numeric)
+
+yam_gly_HA <- drop_na(yam_gly_HA)
+yam_gly_HA$glyc_pos_numeric <- ifelse(yam_gly_HA$domain == "HA2", (yam_gly_HA$glyc_pos_numeric + 347), yam_gly_HA$glyc_pos_numeric)
+
+
+
+yam <- ggplot(yam_gly_HA, aes(x=glyc_pos_numeric, y=percentages, fill= domain))+               
+  geom_col(position = "dodge" , width = 1.5) +
+  xlab("potential glycosylation site") +
+  ylab("% of yamagata lineage strains") +
+  ggtitle("Yamagata lineage N-linked glycosylation") +
+  scale_fill_manual(values=c("tomato3", "cyan4")) +
+  theme_classic() +
+  theme(panel.grid.major = element_blank(),
+    legend.position = "right",
+        legend.title = element_text(size = 14,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 14,
+    face = "bold",
+    hjust = 0.5),
+  axis.text = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.title = element_text(size = 14,
+    face = "bold",
+    colour="black")) +
+  scale_x_continuous(limits = c(0, 571), breaks = seq(0, 571, 50), expand = c(0, 0))
+
+yam
+
+```
+
+
+```{r}
+
+vic_gly_HA1 <- vic_gly %>%
+  group_by(glyc_pos, domain, sequon, clade) %>%
+  summarise(counts = n()) %>%
+  mutate(glyc_pos_numeric = as.numeric(glyc_pos)) %>%
+  arrange(glyc_pos_numeric)
+
+vic_gly_HA1$glyc_pos <- ifelse(vic_gly_HA1$domain == "HA2", (vic_gly_HA1$glyc_pos_numeric + 347), vic_gly_HA1$glyc_pos_numeric)
+
+vic_gly_HA1 <- vic_gly_HA1[,1:5]
+
+
+# table with the necessary statistics 
+ggp_table <- ggplot() +                            
+  theme_void() +
+  annotate(geom = "table",
+           x = 1,
+           y = 1,
+           label = list(vic_gly_HA1)) +
+  theme(plot.margin = unit(rep(2, 4), "cm"))
+
+ggp_table
+ggsave("~/Desktop/flub_msc/results/glycosylation/victable_plot.png", plot = ggp_table, width = 6, height = 4, units = "in", dpi = 300)
+
+
+jpeg("~/Desktop/flub_msc/glycosylation_plots.jpeg",units = "in",width = 14,height = 7,res = 600)
+grid.arrange(vic, yam, nrow=1)
+dev.off()
+graphics.off()
+
+```
+
+
+```{r}
+
+yam_gly_HA1 <- yam_gly %>%
+  group_by(glyc_pos, domain, sequon, clade) %>%
+  summarise(counts = n()) %>%
+  mutate(glyc_pos_numeric = as.numeric(glyc_pos)) %>%
+  arrange(glyc_pos_numeric)
+
+yam_gly_HA1$glyc_pos <- ifelse(yam_gly_HA1$domain == "HA2", (yam_gly_HA1$glyc_pos_numeric + 347), yam_gly_HA1$glyc_pos_numeric)
+yam_gly_HA1 <- yam_gly_HA1[,1:5]
+yam_gly_HA1 <- drop_na(yam_gly_HA1)
+
+# table with the necessary statistics 
+yam_ggp_table <- ggplot() +                            
+  theme_void() +
+  annotate(geom = "table",
+           x = 1,
+           y = 1,
+           label = list(yam_gly_HA1))
+
+yam_ggp_table
+
+
+
+
+
+jpeg("~/Desktop/vicclade_plots.jpeg",units = "in",width = 14,height = 5,res = 600)
+grid.arrange(clades_ke_plot, clades_ug_plot, clades_gbl_plot,nrow=1)
+dev.off()
+graphics.off()
+```
+
+```{r global glycosylations for victoria lineage}
+
+# Read in the nextclade metadata
+
+vic_gly <- read.csv("~/Desktop/flub_msc/global/results/nextclade/HA_vicgbl_nextclade.csv", sep = ";")
+
+#Obtain the names, clade and glycosylated positions
+
+vic_gly <- cbind(vic_gly$seqName, vic_gly$clade, vic_gly$glycosylation)
+vic_gly <- as.data.frame(vic_gly)
+colnames(vic_gly) <- c("seqname", "clade","glycosylation")
+
+#Transform the substitution column to obtain the domain
+
+vic_gly <- separate_rows(vic_gly, glycosylation, sep = ";")
+vic_gly <-vic_gly %>% separate(glycosylation, c("domain", "glyc_pos", "sequon"), sep = ":")
+
+vic_gly_HA <- vic_gly %>%
+  group_by(glyc_pos, domain) %>%
+  summarise(counts = n()) %>%
+  mutate(percentages = counts / 3027  * 100) %>%
+  mutate(glyc_pos_numeric = as.numeric(glyc_pos)) %>%
+  arrange(glyc_pos_numeric)
+
+vic_gly_HA$glyc_pos_numeric <- ifelse(vic_gly_HA$domain == "HA2", (vic_gly_HA$glyc_pos_numeric + 347), vic_gly_HA$glyc_pos_numeric)
+
+new_column <- data.frame(glyc_pos="563",
+                         domain="HA2",
+                         counts=167,
+                         percentages=100.0000,
+                         glyc_pos_numeric=563)
+vic_gly_HA <- bind_rows(vic_gly_HA, new_column)
+
+
+vic <- ggplot(vic_gly_HA, aes(x=glyc_pos_numeric, y=percentages, fill= domain))+               
+  geom_col(position = "dodge" , width = 1.5) +
+  xlab("potential glycosylation site") +
+  ylab("% of victoria lineage strains") +
+  ggtitle("Victoria lineage N-linked glycosylation") +
+  scale_fill_manual(values=c("tomato3", "cyan4")) +
+  theme_classic() +
+  theme(panel.grid.major = element_blank(),
+    legend.position = "none",
+        legend.title = element_text(size = 14,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 14,
+    face = "bold",
+    hjust = 0.5),
+  axis.text = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.title = element_text(size = 14,
+    face = "bold",
+    colour="black")) +
+  scale_x_continuous(limits = c(0, 571), breaks = seq(0, 571, 50), expand = c(0, 0))
+
+vic
+
+
+
+
+
+```
+

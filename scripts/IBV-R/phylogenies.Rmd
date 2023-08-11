@@ -1,0 +1,680 @@
+---
+title: "segment_by_segment_trees"
+author: "Brenda_Kiage"
+date: "2023-05-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+
+
+```{r load the required libraries}
+library(ggtree)
+
+library(ape)
+
+library(ggplot2)
+
+library(dplyr)
+
+library(tidyr)
+
+library(phylotools)
+
+library(dendextend)
+
+library(phangorn)
+
+library(dplyr)
+
+library(treeio)
+
+library(phytools)
+
+library(dendextend)
+
+library(cowplot)
+
+library(ggtreeExtra)
+
+library(castor)
+```
+
+
+
+
+```{r read in the tree and create the metadata file}
+
+# Read in the tree from file
+HA_tree <- read.tree("~/Desktop/flub_msc/results/iqtree_genotype/HA.treefile")
+HA_tree <- read.tree("~/Desktop/flub_msc/results/nextalign/HA_naln.treefile")
+NA_tree <- read.tree("~/Desktop/flub_msc/results/iqtree_genotype/NA.treefile")
+PA_tree <- read.tree("~/Desktop/flub_msc/results/iqtree_genotype/PA.treefile")
+PB1_tree <- read.tree("~/Desktop/flub_msc/results/iqtree_genotype/PB1.treefile")
+PB2_tree <- read.tree("~/Desktop/flub_msc/results/iqtree_genotype/PB2.treefile")
+NP_tree <- read.tree("~/Desktop/flub_msc/results/iqtree_genotype/NP.treefile")
+MP_tree <- read.tree("~/Desktop/flub_msc/results/iqtree_genotype/MP.treefile")
+NS_tree <- read.tree("~/Desktop/flub_msc/results/iqtree_genotype/NS.treefile")
+flub_tree <- read.tree("~/Desktop/flub_msc/results/iqtree_genotype/flub.treefile")
+
+
+#Root at midpoint
+HA_tree <- root_at_midpoint(HA_tree)
+NA_tree <- root_at_midpoint(NA_tree)
+PA_tree <- root_at_midpoint(PA_tree)
+PB1_tree <- root_at_midpoint(PB1_tree)
+PB2_tree <- root_at_midpoint(PB2_tree)
+NP_tree <- root_at_midpoint(NP_tree)
+MP_tree <- root_at_midpoint(MP_tree)
+NS_tree <- root_at_midpoint(NS_tree)
+flub_tree <- root_at_midpoint(flub_tree)
+
+```
+
+
+```{r Obtain the location metadata}
+
+#Obtain the names of the tree
+labels <- HA_tree$tip.label
+write.csv(labels, "~/Desktop/flub_msc/results/DOCS/genotype_labels.csv")
+
+#Read in locations metadata
+locations <- read.csv("~/Downloads/genotype_labels.csv", header = T)
+colnames(locations) <- c("tip_label", "location")
+
+```
+
+
+```{r plot the tree}
+
+HA_treeplot <- ggtree(HA_tree, size = 0.1) %<+% locations +
+
+               geom_tiplab(size = 1.5,  aes(color = location)) +
+  
+              scale_color_manual(name = "Location",
+                                  values = c("KCH" = "blue4", "Matsangoni" = "darkgreen", "Mavueni"= "tomato3", "Mtondia" = "darkmagenta", "Pingilikani" = "coral4", "Jinja" = "cyan4", "Soroti" = "plum4", "Mbale" = "yellow4", "Vaccine strain" = "red3", "Kilifi 2016 strain" = "goldenrod")) +
+                 geom_treescale()
+
+
+
+
+c("coral4","olivedrab", "goldenrod", "plum4","blue4", "cyan4", "tomato3","slategray4")
+
+```
+
+
+
+```{r}
+
+HA_treeplot
+
+
+NA_treeplot
+PA_treeplot
+PB1_treeplot
+PB2_treeplot
+NP_treeplot
+MP_treeplot
+NS_treeplot
+flub_treeplot
+
+```
+
+
+
+```{r}
+jpeg("~/Desktop/flub_plots.jpeg",units = "in",width = 14,height = 12,res = 600)
+HA_treeplot
+dev.off()
+graphics.off()
+```
+
+```{r}
+HA_treeplot <- ggtree(HA_tree, size = 0.5) %<+% locations +
+
+               geom_tiplab(size = 4,  aes(color = location)) +
+  
+              scale_color_manual(name = "Location",
+                                  values = c("KCH" = "blue4", "Matsangoni" = "darkgreen", "Mavueni"= "tomato3", "Mtondia" = "darkmagenta", "Pingilikani" = "coral4", "Jinja" = "cyan4", "Soroti" = "plum4", "Mbale" = "yellow4", "Vaccine strain" = "red3", "Reference strain" = "black")) +
+  
+    ggtitle(" IBV HA phylogeny") +
+   
+     geom_treescale() +
+     
+     geom_nodepoint(aes(subset = node >=70), size=0.9) +
+  
+              theme(panel.grid.major = element_line(colour = "grey", linetype = "dashed", linewidth = 0.2), 
+                    plot.title = element_text(      
+                    size = 12,
+                    face = "bold",
+                    hjust = 0.5),  
+                    legend.position = "none") +  xlim(0, 0.15)
+
+
+
+
+HA_treeplot 
+
+  
+  
+```
+
+
+
+
+```{r}
+
+  
+              geom_cladelabel(node=114, label="Victoria", offset = .025, fontsize = 5) +
+              geom_cladelabel(node=115, label="Yamagata", offset = .025, fontsize = 4) +
+              geom_cladelabel(node=3, label="Y1", offset = .0455, fontsize = 5) +
+              geom_cladelabel(node=117, label="Y2", offset = .036, fontsize = 5) +
+              geom_cladelabel(node=122, label="Y3", offset = .02, fontsize = 5) +
+              geom_cladelabel(node=1, label="V1B", offset = .043, fontsize = 5) +
+              #geom_cladelabel(node=93, label="V1A", offset = .049) +
+              geom_cladelabel(node=223, label="V1A", offset = .02, fontsize = 5) +
+              geom_cladelabel(node=210, label="V1A.1", offset = .028, fontsize = 5) +
+              geom_cladelabel(node=105, label="V1A.2", offset = .028, fontsize = 5) +
+              geom_cladelabel(node=149, label="V1A.3", offset = .024, fontsize = 5) +
+              geom_cladelabel(node=215, label="V1A.3a.1", offset = .022, fontsize = 5) +
+              geom_cladelabel(node=156, label="V1A.3a.2", offset = .013, fontsize = 5) +
+  
+              geom_nodelab(
+                   mapping = aes(
+                   x = branch,
+                   label = label,
+                   subset = !is.na(as.numeric(label)) & as.numeric(label) > 70), size=2, vjust=-0.2) + 
+              
+              ggtitle("HA segment") +
+              
+              #geom_text(aes(label=node), hjust=-.3, size = 3) +
+              
+              theme_classic() +
+              
+              scale_y_continuous(breaks = seq(0, 300, 50)) +
+  
+              theme(panel.grid.major = element_line(colour = "grey", linetype = "dashed", linewidth = 0.2), 
+                    plot.title = element_text(      
+                    size = 12,
+                    face = "bold",
+                    hjust = 0.5),  
+                    legend.position = "none") 
+
+HA_treeplot +  xlim(0, 0.12)
+
+
+
+
+#rm(list=ls())
+
+
+
+#?geom_cladelabel
+
+```
+
+
+
+
+
+
+```{r}
+
+# Read in the tree from file
+HA_tree <- read.tree("~/Desktop/Msc/flub_results/iqtree/HA.treefile")
+
+#Root at midpoint
+HA_tree <- root_at_midpoint(HA_tree)
+
+#Read in dates metadata
+dates <- read.csv("~/Desktop/Msc/flub_results/genotyping/phylogeny/dates.csv", header = F)
+colnames(dates) <- c("tip_label", "dates")
+dates$dates <- as.character(dates$dates)
+typeof(dates$dates)
+
+
+HA_treeplot <- ggtree(HA_tree, size = 0.3) %<+% dates +
+
+               geom_tippoint(size = 2,  aes(color = dates)) +
+  
+              scale_color_manual(name = "Year",
+                                 values = c("2010" = "blue", "2011" = "limegreen", "2012"= "darkorchid3", "2017" ="darkgreen", "2013"= "tan", "2014" = "orchid4", "2019" = "maroon3", "2020" = "orange", "2021" = "red"), na.value = "black") +
+  
+              geom_cladelabel(node=114, label="Victoria", offset = .025, fontsize = 5) +
+              geom_cladelabel(node=115, label="Yamagata", offset = .025, fontsize = 4) +
+              geom_cladelabel(node=3, label="Y1", offset = .0455, fontsize = 5) +
+              geom_cladelabel(node=117, label="Y2", offset = .036, fontsize = 5) +
+              geom_cladelabel(node=122, label="Y3", offset = .02, fontsize = 5) +
+              geom_cladelabel(node=1, label="V1B", offset = .043, fontsize = 5) +
+              #geom_cladelabel(node=93, label="V1A", offset = .049) +
+              geom_cladelabel(node=223, label="V1A", offset = .02, fontsize = 5) +
+              geom_cladelabel(node=210, label="V1A.1", offset = .028, fontsize = 5) +
+              geom_cladelabel(node=105, label="V1A.2", offset = .028, fontsize = 5) +
+              geom_cladelabel(node=142, label="V1A.3", offset = .0195, fontsize = 5) +
+              geom_cladelabel(node=215, label="V1A.3a.1", offset = .022, fontsize = 5) +
+              geom_cladelabel(node=156, label="V1A.3a.2", offset = .013, fontsize = 5) +
+  
+              geom_nodelab(
+                   mapping = aes(
+                   x = branch,
+                   label = label,
+                   subset = !is.na(as.numeric(label)) & as.numeric(label) > 70), size=2, vjust=-0.2) + 
+              
+              ggtitle("HA segment") +
+              
+              xlab("Genetic distance") +
+              
+              #geom_text(aes(label=node), hjust=-.3, size = 3) +
+              
+              theme_classic() +
+              
+              scale_y_continuous(breaks = seq(0, 300, 50)) +
+  
+              theme(panel.grid.major = element_line(colour = "grey", linetype = "dashed", linewidth = 0.2), 
+                    plot.title = element_text(      
+                    size = 12,
+                    face = "bold",
+                    hjust = 0.5), 
+                    axis.title.x = element_text(
+                    size = 12,
+                    face = "bold",
+                    hjust = 0.5),
+                    legend.position = "none") 
+
+HA_treeplot +  xlim(0, 0.12)
+
+
+```
+
+
+```{r Read in locations metadata}
+
+global_metadata <- read.csv("~/Desktop/Msc/flub_results/iqtree_global/vic/vic_global_metadata.csv")
+global_metadata <- global_metadata %>% unite(V1, c(isolate_name, collection_date), sep = "|")
+
+global_locations <- read.csv("~/Desktop/Msc/flub_results/iqtree_global/vic/locations_global.csv", header = F)
+ref_global <- global_locations %>% filter(grepl("^B/", V1))
+ref_global <- ref_global %>% separate(V1, c("isolate_name","country","segment","collection_date"), sep = "\\|")
+ref_global <- ref_global %>% unite(V1, c(isolate_name,collection_date), sep = "|")
+
+names <- unique(ref_global$V1)
+
+duplicates <- ref_global[duplicated(ref_global$V1), ]
+
+ref_global_conts <- subset(global_metadata, V1 %in% names, select=c(V1, continent))
+
+non_dups <- unique(ref_global_conts)
+
+ref_global_dups <-  subset(global_metadata, V1 %in% duplicates$V1, select=c(V1, continent))
+
+dups <- unique(ref_global_dups)
+
+
+ref_global_cont <- subset(global_metadata, V1 %in% ref_global$V1, select=c(V1,continent))
+ref_global_cont <- ref_global_cont %>% distinct(V1)
+
+
+colnames(global_locations) <- c("tip_label", "location")
+
+```
+
+
+```{r Generate global phylogenies}
+
+# Read in the tree from file
+HAglobal_tree <- read.tree("~/Desktop/Msc/flub_results/iqtree_global/vic/HA_victotal.treefile")
+
+
+#Root at midpoint
+HAglobal_tree <- root_at_midpoint(HAglobal_tree)
+
+#Extract the tree labels
+HAgloballabels <- HAglobal_tree$tip.label
+write(HAgloballabels, "~/Desktop/Msc/flub_results/iqtree_global/vic/HAglobal_labels.txt")
+
+
+#Read in locations metadata
+global_locations <- read.csv("~/Desktop/Msc/flub_results/iqtree_global/vic/locations_global.csv", header = F)
+colnames(global_locations) <- c("tip_label", "location")
+
+HAglobal_treeplot <- ggtree(HAglobal_tree, size = 0.1) %<+% global_locations +
+  geom_tippoint(aes(subset=(location %in% c("KCH","Matsangoni","Mavueni","Pingilikani","Jinja","Soroti","Mbale","Mtondia")),color = location), stroke=0.2, align=T, size=4) +
+  
+              scale_color_manual(name = "Location",
+                                  values = c("KCH" = "blue", "Matsangoni" = "red2", "Mavueni"= "darkorchid3", "Mtondia" =                                           "darkgreen", "Pingilikani" = "coral4", "Jinja" = "orchid4", "Soroti" = "maroon3", "Mbale" = "orange"),
+                                  na.value = "black") +
+  
+              
+              ggtitle("Global context of HA segment of the Yamagata lineage") +
+              xlab("Genetic distance") +
+              
+              #geom_text2(aes(subset = !isTip,label=node), hjust=1, vjust=1, size =2) +
+              
+              #theme_classic() +
+              theme_tree2() +
+              
+              #scale_y_continuous(breaks = seq(0, 300, 50)) +
+  
+              theme(panel.grid.major = element_line(colour = "grey", linetype = "dashed", linewidth = 0.2), 
+                    plot.title = element_text(      
+                    size = 12,
+                    face = "bold",
+                    hjust = 0.5),  
+                    legend.position = "right",
+                    axis.title.x = element_text(
+                    size = 12,
+                    face = "bold",
+                    hjust = 0.5),
+                    )
+
+HAglobal_treeplot
+
+#+  xlim(0, 0.12)
+
+
+
+
+```
+
+
+```{r}
+
+# Read in the tree from file
+HAglobal_tree <- read.tree("~/Downloads/HAfes (1).treefile")
+
+
+#Root at midpoint
+HAglobal_tree <- root_at_midpoint(HAglobal_tree)
+
+#Extract the tree labels
+HAgloballabels <- HAglobal_tree$tip.label
+write(HAgloballabels, "~/Desktop/Msc/flub_results/iqtree_global/vic/HAglobal_labels.txt")
+
+
+HAglobal_treeplot <- ggtree(HAglobal_tree, size = 0.1) +
+
+  geom_tippoint(size = 1, aes(color = ifelse(grepl("Kilifi", label), "Kilifi", "references")), stroke=0.2, align=T, size=4) +
+  
+   scale_color_manual(name = "Location",
+                                  values = c("Kilifi" = "red"),
+                                  na.value = "black") 
+  
+  
+  HAglobal_treeplot
+  ggtitle("Phylogenetic tree of Influenza B HA segment") +
+  
+  theme(
+    legend.title = element_text(    # defines font size and format of the legend title
+      face = "bold",
+      size = 16),  
+    legend.key.size = unit(12, "pt"),
+    legend.text=element_text(       # defines font size and format of the legend text
+      face = "bold",
+      size = 8),
+    plot.title = element_text(      # defines font size and format of the plot title
+      size = 12,
+      face = "bold",
+      hjust = 0.5),  
+    legend.position = "right",     # defines placement of the legend
+    legend.box = "vertical",        # defines placement of the legend
+    legend.margin = margin())
+  
+HA_treeplot + theme_tree2()
+
+HAglobal_treeplot <- ggtree(HAglobal_tree, size = 0.1) %<+% global_locations +
+  geom_tippoint(aes(subset=(location %in% c("KCH","Matsangoni","Mavueni","Pingilikani","Jinja","Soroti","Mbale","Mtondia")),color = location), stroke=0.2, align=T, size=4) +
+  
+              scale_color_manual(name = "Location",
+                                  values = c("KCH" = "blue", "Matsangoni" = "red2", "Mavueni"= "darkorchid3", "Mtondia" =                                           "darkgreen", "Pingilikani" = "coral4", "Jinja" = "orchid4", "Soroti" = "maroon3", "Mbale" = "orange"),
+                                  na.value = "black") +
+  
+              
+              ggtitle("Global context of HA segment of the Yamagata lineage") +
+              xlab("Genetic distance") +
+              
+              #geom_text2(aes(subset = !isTip,label=node), hjust=1, vjust=1, size =2) +
+              
+              #theme_classic() +
+              theme_tree2() +
+              
+              #scale_y_continuous(breaks = seq(0, 300, 50)) +
+  
+              theme(panel.grid.major = element_line(colour = "grey", linetype = "dashed", linewidth = 0.2), 
+                    plot.title = element_text(      
+                    size = 12,
+                    face = "bold",
+                    hjust = 0.5),  
+                    legend.position = "right",
+                    axis.title.x = element_text(
+                    size = 12,
+                    face = "bold",
+                    hjust = 0.5),
+                    )
+
+HAglobal_treeplot
+
+#+  xlim(0, 0.12)
+```
+
+
+
+
+```{r Subset 1 vic}
+
+viewClade(HAglobal_treeplot , node = 5799)
+
+#tree2 <- tree_subset(HAglobal_tree,node=5799)
+tree2 <- tree_subset(HAglobal_tree,"240577|Mavueni|2021-12-16", levels_back = 1)
+
+#Extract the tree labels
+ss1_labels <- tree2$tip.label
+write(labels <- tree2$tip.label, "~/Desktop/Msc/flub_results/iqtree_global/vic/ss1_labels.txt")
+
+#Read in locations metadata
+ss1_locations <- read.csv("~/Desktop/Msc/flub_results/iqtree_global/vic/locations_ss1.csv", header = F)
+colnames(ss1_locations) <- c("tip_label", "location")
+
+#Read in dates metadata
+ss1_dates <- read.csv("~/Desktop/Msc/flub_results/iqtree_global/vic/ss1_dates.csv", header = F)
+colnames(ss1_dates) <- c("tip_label", "dates")
+
+#Bind the two dataframes
+ss1_metadata <- cbind(ss1_locations, ss1_dates$dates)
+colnames(ss1_metadata) <- c("tip_label", "location", "dates")
+```
+
+
+```{r}
+p2 <- ggtree(tree2, size = 0.2)  %<+% ss1_metadata + 
+  
+  geom_tiplab(aes(color=location),
+              size = 3,
+              hjust = -.1,
+              align = F) +
+
+  geom_nodelab(mapping = aes(
+                   x = branch,
+                   label = label,
+                   subset = !is.na(as.numeric(label)) & as.numeric(label) > 70), size=2, vjust=-0.2) +
+  
+  theme_tree2() +
+  scale_y_continuous(breaks = seq(0, 100, 20)) +
+  
+  geom_tippoint(
+    aes(color=location,
+        shape = as.factor(dates)) , size = 3) +
+  
+  scale_shape_manual(values=c(17, 15 ,18)) +
+  
+  scale_color_manual(name = "Location",
+                                  values = c("KCH" = "blue", "Matsangoni" = "red2", "Mavueni"= "darkorchid3", "Mtondia" =                                           "darkgreen", "Pingilikani" = "coral4", "Jinja" = "orchid4", "Soroti" = "maroon3", "Mbale" = "orange"),
+                                  na.value = "black") +
+ xlim(0, 0.006)
+    
+    #xlab("genetic distance") +                    # add a label to the x-axis
+    #theme(
+    #axis.title.x = element_text(size = 10),
+    #legend.text = element_text(face = "bold", size = 10)
+  #)
+  
+    
+```
+
+
+```{r subset 2}
+viewClade(HAglobal_treeplot , node = 5558)
+
+#tree2 <- tree_subset(HAglobal_tree,node=5799)
+tree3 <- tree_subset(HAglobal_tree,"115992|KCH|2012-11-17", levels_back = 4)
+
+
+#Extract the tree labels
+ss2_labels <- tree3$tip.label
+write(ss2_labels, "~/Desktop/Msc/flub_results/iqtree_global/vic/ss2_labels.txt")
+
+#Read in locations metadata
+ss2_locations <- read.csv("~/Desktop/Msc/flub_results/iqtree_global/vic/locations_ss2.csv", header = F)
+colnames(ss2_locations) <- c("tip_label", "location")
+
+#Read in dates metadata
+ss2_dates <- read.csv("~/Desktop/Msc/flub_results/iqtree_global/vic/ss2_dates.csv", header = F)
+colnames(ss2_dates) <- c("tip_label", "dates")
+
+#Bind the two dataframes
+ss2_metadata <- cbind(ss2_locations, ss2_dates$dates)
+colnames(ss2_metadata) <- c("tip_label", "location", "dates")
+```
+
+```{r}
+plot_grid(HAglobal_treeplot, p2, ncol=2) 
+%>% plot_grid(HAglobal_treeplot, p2, ncol=2, labels=c("A", "B"),
+rel_widths=c(.5, 1))
+```
+
+
+```{r}
+
+#Create a metadata file with the year and location column
+metadata <- flub_tree$tip.label
+metadata_df <- as.data.frame(metadata)
+rownames(metadata_df) <- metadata
+
+references <- metadata_df[grepl("B/", metadata_df$metadata), ]
+ref_df <- as.data.frame(references)
+ref_df$references <- gsub("'", "", ref_df$references)
+ref_df <- ref_df %>% separate(references, c("sample_id","Lineage", "segment", "clade", "collection_date"), sep = "\\|")
+#ref_df <- ref_df %>% separate(references, c("sample_id","Lineage", "clade"), sep = "\\|")
+ref_df <- ref_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+#ref_df <- ref_df %>% separate(sample_id, c("subtype", "country", "version" , "year"), sep = "/")
+rownames(ref_df) <- references
+
+samples <- metadata_df[!grepl("B/", metadata_df$metadata), ]
+sample_df <- as.data.frame(samples)
+sample_df$samples <- gsub("'", "", sample_df$samples)
+sample_df <- sample_df %>% separate(samples, c("sample_id", "Location","collection_date"), sep = "\\|")
+sample_df <- sample_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+sample_df$year <- gsub("9/1/2020","2020", sample_df$year)
+sample_df$year <- gsub("11/11/2019","2019", sample_df$year)
+sample_df$year <- gsub("2/11/2021","2021", sample_df$year)
+rownames(sample_df) <- samples
+
+mdata <- bind_rows(ref_df, sample_df)
+mdata <- mdata[rownames(metadata_df), ]
+mdata$label <- rownames(metadata_df)
+mdata$Location <- as.factor(mdata$Location)
+
+```
+
+
+```{r plot the heatmap describing the years}
+
+
+HA_plot <- HA_treeplot + geom_fruit(data=mdata, geom = geom_tile,
+                         mapping = aes(y=label, x=year, fill=Location),
+                         offset=0.08, pwidth=0.5,
+                         axis.params = list(axis="x", hjust=0.5, vjust=0.6,text= mdata$year, text.angle=0, text.size = 2),
+                         grid.params = list()) +
+                         scale_fill_manual(name="Location", values=c("KCH" = "royalblue", "Matsangoni" = "red2", 
+                               "Mavueni"= "darkorchid3", "Mtondia" = "olivedrab4", 
+                               "Pingilikani" = "coral4", "Jinja" = "khaki3", 
+                               "Soroti" = "maroon3", "Mbale" = "orange"), guide = "none")
+
+
+HA_plot
+
+
+
+
+```
+
+
+```{r}
+ggsave("~/Desktop/Msc/plots/HA_mltreeplot.png", plot = HA_plot, dpi = 600, width = 14,height = 7)
+```
+
+
+
+
+
+
+
+```{r generate tsv date files for treetime}
+# Read in the tree from file
+
+NS_tree <- read.tree("~/Desktop/Msc/flub_results/iqtree_ml/NS_tree.nwk")
+NS_tree$tip.label
+
+
+#Create a metadata file with the year and location column
+metadata <- NS_tree$tip.label
+metadata_df <- as.data.frame(metadata)
+rownames(metadata_df) <- metadata
+
+references <- metadata_df[grepl("B/", metadata_df$metadata), ]
+ref_df <- as.data.frame(references)
+ref_df$references <- gsub("'", "", ref_df$references)
+ref_df <- ref_df %>% separate(references, c("sample_id","Lineage", "segment", "clade", "collection_date"), sep = "\\|")
+#ref_df <- ref_df %>% separate(references, c("sample_id","Lineage", "clade"), sep = "\\|")
+ref_df <- ref_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+#ref_df <- ref_df %>% separate(sample_id, c("subtype", "country", "version" , "year"), sep = "/")
+rownames(ref_df) <- references
+
+samples <- metadata_df[!grepl("B/", metadata_df$metadata), ]
+sample_df <- as.data.frame(samples)
+sample_df$samples <- gsub("'", "", sample_df$samples)
+sample_df <- sample_df %>% separate(samples, c("sample_id", "Location","collection_date"), sep = "\\|")
+sample_df <- sample_df %>% separate(collection_date, c("year", "month", "date"), sep = "-")
+sample_df$year <- gsub("9/1/2020","2020", sample_df$year)
+sample_df$year <- gsub("11/11/2019","2019", sample_df$year)
+sample_df$year <- gsub("2/11/2021","2021", sample_df$year)
+rownames(sample_df) <- samples
+
+mdata <- bind_rows(ref_df, sample_df)
+mdata <- mdata[rownames(metadata_df), ]
+mdata$label <- rownames(metadata_df)
+mdata$Location <- as.factor(mdata$Location)
+mdata$month[is.na(mdata$month)] <- "XX"
+mdata$date[is.na(mdata$date)] <- "XX"
+
+mdata <- mdata %>% unite("collection_date", c(year, month, date), sep = "-")
+dates <- data.frame(mdata$label, mdata$collection_date)
+colnames(dates) <- c("name", "collection_date")
+dates$collection_date <- gsub("2018-1-26", "2018-01-26", dates$collection_date)
+dates$collection_date <- gsub("2020-XX-XX","2020-01-09", dates$collection_date)
+dates$collection_date <- gsub("2019-XX-XX","2019-11-11", dates$collection_date)
+dates$collection_date <- gsub("2021-XX-XX","2021-11-02", dates$collection_date)
+
+dates$name <- gsub("'","", dates$name)
+
+
+
+library(lubridate)
+dates$collection_date <- decimal_date(ymd(dates$collection_date))
+
+write_tsv(dates, "~/Desktop/Msc/flub_results/treetime/NS_metadata.tsv")
+
+```
+

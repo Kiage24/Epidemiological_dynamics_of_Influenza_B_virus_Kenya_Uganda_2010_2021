@@ -1,0 +1,143 @@
+---
+title: "flub_sample_metadata"
+author: "Brenda_Kiage"
+date: "2023-05-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+
+```{r Load required libraries}
+
+library(readr)
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(zoo)
+library(scales)
+
+```
+
+
+
+
+```{r Sample lists reading}
+
+KHDSS_IP <- read_excel("~/Desktop/Msc/docs/flub_positives_for_sequencing_freezer_pos_2010_2022_IP.xlsx")
+KHDSS_OP <-  read_excel("~/Desktop/Msc/docs/current_surveillance_SPReD_KHDSS (1).xlsx")
+COAST <- read_excel("~/Desktop/Msc/docs/FLUB_positives_for_sequencing_freezer_pos_COAST_study.xlsx")
+
+```
+
+
+
+```{r Editing collection date column}
+
+#Select the first three columns containing sample-id, location and collection dates
+KHDSS_IP_cdate <- KHDSS_IP[,1:3]
+KHDSS_OP_cdate <- KHDSS_OP[,1:3]
+COAST_cdate <- COAST[ ,1:3]
+
+#Rename the column names to facilitate binding of rows
+colnames(KHDSS_IP_cdate) <- c("sample_id","location", "collection_date")
+colnames(KHDSS_OP_cdate) <- c("sample_id","location", "collection_date")
+colnames(COAST_cdate) <- c("sample_id","location", "collection_date")
+
+#Convert the collection date column to date format
+KHDSS_IP_cdate$collection_date <- as.Date(KHDSS_IP_cdate$collection_date)
+KHDSS_OP_cdate$collection_date <- as.Date(KHDSS_OP_cdate$collection_date)
+COAST_cdate$collection_date <- as.Date(COAST_cdate$collection_date)
+
+#Add a column showing the nature of the study
+KHDSS_IP_cdate$study <- rep("KHDSS-IP", 47)
+KHDSS_OP_cdate$study <- rep("KHDSS-OP", 113)
+COAST_cdate$study <- rep("COAST", 14)
+
+#Bind the three dfs row-wise
+flub_list <- rbind(KHDSS_OP_cdate, KHDSS_IP_cdate, COAST_cdate)
+
+# Separate the collection date column 
+flub_list1 <- flub_list %>% separate(collection_date, c("Year", "Month", "Day"), sep="-")
+flub_list1$Day1 <- rep("01", 174)
+flub_list1 <- flub_list1 %>% unite(collection_date, c(Year, Month, Day1), sep="-")
+
+write_csv(flubs, "~/Desktop/Msc/docs/flub_sample_list.csv")
+                          
+
+```
+
+
+```{r plot sample distribution}
+
+# Convert Date to month-year format
+flub_list1$MonthYear <- as.Date(flub_list1$collection_date)
+
+#Obtain counts of the various dates in the locations
+flubs <- flub_list1 %>% 
+             group_by(location,MonthYear) %>%
+             summarise(counts = n())
+
+#Generate the plots
+year_labels <- rep(c('J','F','M','A','M','J','J','A','S','O','N','D'),13)
+
+sample_dis <- ggplot(flubs, aes(x=MonthYear, y=counts,fill=location)) +
+  
+  geom_col(position = "stack") +
+  
+  ylab("Number of IBV positives") +
+  
+  xlab("Influenza season") +
+  
+  ggtitle("Influenza B Virus positive isolates from Kenya and Uganda") +
+  
+  scale_fill_manual(values=c("steelblue","olivedrab", "goldenrod", "plum4","blue4", "cyan4", "tomato3","coral4")) +
+  
+  scale_x_date(date_labels=paste(year_labels, ifelse(year_labels == "F", "\n%Y", "")) ,date_breaks  ="1 month") +
+  
+  theme_classic() +
+  
+  theme(panel.grid.major = element_blank(),
+    legend.position = "bottom",
+        legend.title = element_text(size = 13,
+    face = "bold",
+    hjust = 0.5),
+        legend.text = element_text(size=13,
+                                   face = "bold"),
+        plot.title = element_text(
+    size = 13,
+    face = "bold",
+    hjust = 0.5),
+  axis.text.x = element_text(size = 9,
+    face = "bold",
+    colour="black"),
+  axis.text.y = element_text(size = 13,
+    face = "bold",
+    colour = "black"),
+  axis.title = element_text(size = 14,
+    face = "bold",
+    colour="black")
+  ) +
+  
+scale_y_continuous(breaks=seq(0,60,10))
+
+
+sample_dis
+
+jpeg("~/Desktop/flub_msc/sample_dis_plots.jpeg",units = "in",width = 14,height = 8,res = 600)
+sample_dis
+dev.off()
+graphics.off()
+
+
+
+
+  
+```
+
+
+
+

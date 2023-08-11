@@ -1,0 +1,918 @@
+---
+title: "clade_distribution"
+author: "Brenda_Kiage"
+date: "2023-07-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+
+```{r load in the required libraries}
+
+library(readr)
+
+library(tidyr)
+
+library(dplyr)
+
+library(ggtree)
+
+library(viridis)
+
+library(Biostrings)
+
+library(gridExtra)
+
+library(ggplot2)
+
+library(cowplot)
+
+
+
+
+```
+
+
+
+```{r clade ditribution_ke, victoria lineage}
+
+# Read in the data
+clades_ke <- read.csv("~/Downloads/vicclade_ke.csv", sep = ",", header=T)
+colnames(clades_ke) <- c("clade", "year")
+
+
+clades_ke_summary <- clades_ke %>%
+  mutate(date = as.Date(year),
+         year = lubridate::year(date),) %>%
+  group_by(year, clade) %>%
+  summarise(counts = n()) %>%
+  group_by(year) %>%
+  mutate(
+    percentages = counts / sum(counts) * 100
+  ) %>%
+  ungroup()
+
+# Create a new date column combining year and month for plotting
+clades_ke_summary$date <- as.Date(paste(clades_ke_summary$year, "01", "01", sep = "-"))
+
+# Plot the time series with months
+clades_ke_plot <- ggplot(clades_ke_summary, aes(x = date, y = percentages, fill = clade)) +
+  geom_col(width=200, position = "stack", preserve="single") +
+  theme_classic() +
+    xlab("Influenza season") +
+    ylab("% of IBV victoria lineage clades") +
+     ggtitle("Victoria lineage clade distribution", subtitle = "Kenya")+
+    theme_classic() +
+  
+  theme(panel.grid.major = element_blank(),
+    legend.position = "none",
+        legend.title = element_text(size = 14,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 14,
+    face = "bold",
+    hjust = 0.5),
+    plot.subtitle = element_text(size = 12,
+                                 face = "bold",
+                                 hjust=0.5),
+  axis.text = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.title = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+   axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5)) +
+    scale_fill_manual(values=c("coral4","plum4","tomato3", "goldenrod","blue4", "cyan4", "tomato3","slategray4")) +
+   scale_x_date(breaks = seq(as.Date("2011-01-01"), as.Date("2021-12-31"), by="1 year"), date_labels = "%Y")
+
+
+clades_ke_plot <- clades_ke_plot +
+geom_segment(aes(x = as.Date("2011-01-01"), xend = as.Date("2021-01-01"), y = 108, yend = 108, colour="red")) +
+annotate("text", x=as.Date("2016-01-01"), y=111, label="KCH study", size=3) +
+geom_segment(aes(x = as.Date("2020-01-01"), xend = as.Date("2021-01-01"), y = 102, yend = 102, colour="blue")) +
+annotate("text", x=as.Date("2020-01-01"), y=105, label="KHDSS study", hjust=0.3, size=3)
+
+
+clades_ke_plot
+
+```
+
+
+
+
+```{r clade distribution for ugandan dataset, victoria lineage}
+
+# Read in the data
+clades_ug <- read.csv("~/Downloads/vicclade_ug.csv", sep = ",", header=F)
+colnames(clades_ug) <- c("clade", "year")
+
+
+clades_ug_summary <- clades_ug %>%
+  mutate(date = as.Date(year),
+         year = lubridate::year(date),) %>%
+  group_by(year, clade) %>%
+  summarise(counts = n()) %>%
+  group_by(year) %>%
+  mutate(
+    percentages = counts / sum(counts) * 100
+  ) %>%
+  ungroup()
+
+# Create a new date column combining year and month for plotting
+clades_ug_summary$date <- as.Date(paste(clades_ug_summary$year, "01", "01", sep = "-"))
+
+# Plot the time series with months
+clades_ug_plot <- ggplot(clades_ug_summary, aes(x = date, y = percentages, fill = clade)) +
+  geom_col(width=200, position = "stack", preserve="single") +
+  theme_classic() +
+    xlab("Influenza season") +
+    ylab("% of IBV victoria lineage clades") +
+     ggtitle("Uganda")+
+    theme_classic() +
+  
+  theme(panel.grid.major = element_blank(),
+    legend.position = "none",
+        legend.title = element_text(size = 12,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 12,
+    face = "bold",
+    hjust = 0.5),
+  axis.text = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.title = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+   axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5)) +
+    scale_fill_manual(values=c("plum4","blue4", "coral4","olivedrab", "goldenrod", "cyan4", "tomato3","slategray4")) +
+  #scale_x_date(breaks = seq(as.Date("2011-01-01"), as.Date("2021-12-31"), by="1 year"), date_labels = "%Y")
+    scale_x_date(
+    date_labels = "%Y",  # Display only the year on the x-axis
+    date_breaks = "1 year",  # Set the interval for major tick marks to 1 year
+    limits = as.Date(c("2010-12-31", "2020-12-31"))  # Set the x-axis limits from 2017 to 2020
+  )
+  
+
+
+clades_ug_plot <- clades_ug_plot  +
+geom_segment(aes(x = as.Date("2016-12-31"), xend = as.Date("2020-01-01"), y = 108, yend = 108, colour="orangered2")) +
+annotate("text", x=as.Date("2019-01-01"), y=111, label="COAST study", size=3, hjust=0.7)
+
+clades_ug_plot
+
+```
+
+```{r clade distribution victoria lineage, global dataset}
+
+global_vic_clades <- read.csv("~/Downloads/nextclade (5).csv", sep=";")
+
+write_csv(global_vic_clades[ ,2:3], "~/Desktop/global-vic_dates.csv")
+
+
+# Read in the data
+clades_gbl <- read.csv("~/Downloads/global-vic_dates.csv", sep = ",", header=T)
+colnames(clades_gbl) <- c("year", "clade")
+
+
+clades_gbl <- clades_gbl %>% separate(year, c("year", "month", "day"))
+clades_gbl <- subset(clades_gbl, year >= 2009 )
+clades_gbl <- clades_gbl %>% unite(year, c(year, month, day), sep = "-")
+
+clades_gbl_summary <- clades_gbl %>%
+  mutate(date = as.Date(year),
+         year = lubridate::year(date),) %>%
+  group_by(year, clade) %>%
+  summarise(counts = n()) %>%
+  group_by(year) %>%
+  mutate(
+    percentages = counts / sum(counts) * 100
+  ) %>%
+  ungroup()
+
+# Create a new date column combining year and month for plotting
+clades_gbl_summary$date <- as.Date(paste(clades_gbl_summary$year, "01", "01", sep = "-"))
+clades_gbl_summary <- subset(clades_gbl_summary, year >= 2011 & year <= 2021)
+ 
+# Plot the time series with months
+clades_gbl_plot <- ggplot(clades_gbl_summary, aes(x = date, y = percentages, fill = clade)) +
+  geom_col(width=200, position = "stack", preserve="single") +
+  theme_classic() +
+    xlab("Influenza season") +
+    ylab("% of IBV victoria lineage clades") +
+     ggtitle("Globally")+
+    theme_classic() +
+  
+  theme(panel.grid.major = element_blank(),
+    legend.position = "bottom",
+        legend.title = element_text(size = 12,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 13,
+    face = "bold",
+    hjust = 0.5),
+  axis.text = element_text(size = 13,
+    face = "bold",
+    colour="black"),
+  axis.title = element_text(size = 13,
+    face = "bold",
+    colour="black"),
+   axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5)) +
+    scale_fill_manual(values=c("coral4","olivedrab", "goldenrod", "plum4","blue4", "cyan4", "tomato3","slategray4")) +
+  scale_x_date(breaks = seq(as.Date("2011-01-01"), as.Date("2021-12-31"), by="1 year"), date_labels = "%Y")
+   
+
+
+
+clades_gbl_plot
+
+jpeg("~/Desktop/clade_dis_plots.jpeg",units = "in",width = 14,height = 14,res = 600)
+grid.arrange(clades_ke_plot, cladesyam_ke_plot, ke_plot, clades_ug_plot, cladesyam_ug_plot, ug_plot,clades_gbl_plot, clades_gblyam_plot, global_plot, nrow=3,ncol=3)
+dev.off()
+graphics.off()
+
+
+
+grid.arrange(clades_ke_plot, cladesyam_ke_plot, ke_plot, clades_ug_plot, cladesyam_ug_plot,   ug_plot,  clades_gbl_plot, clades_gblyam_plot, global_plot, nrow=3,ncol=3)
+```
+
+
+
+
+
+
+```{r}
+
+yam_clades <- read.csv("~/Downloads/nextclade (6).csv", sep=";")
+
+write_csv(yam_clades[ ,2:3], "~/Desktop/yam_clades.csv")
+
+# Read in the data
+clades_ke_yam <- read.csv("~/Downloads/yam_clades_ke.csv", sep = ",", header=T)
+colnames(clades_ke_yam) <- c("year", "clade")
+
+
+clades_yam_summary <- clades_ke_yam %>%
+  mutate(date = as.Date(year),
+         year = lubridate::year(date),) %>%
+  group_by(year, clade) %>%
+  summarise(counts = n()) %>%
+  group_by(year) %>%
+  mutate(
+    percentages = counts / sum(counts) * 100
+  ) %>%
+  ungroup()
+
+# Create a new date column combining year and month for plotting
+clades_yam_summary$date <- as.Date(paste(clades_yam_summary$year, "01", "01", sep = "-"))
+
+# Plot the time series with months
+cladesyam_ke_plot <- ggplot(clades_yam_summary, aes(x = date, y = percentages, fill = clade)) +
+  geom_col(width=200, position = "stack", preserve="single") +
+  theme_classic() +
+    xlab("Influenza season") +
+    ylab("% of IBV yamagata lineage clades") +
+   ggtitle("Yamagata lineage clade distribution", subtitle = "Kenya") +
+  theme(panel.grid.major = element_blank(),
+    legend.position = "none",
+    legend.title = element_text(size = 14,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 14,
+    face = "bold",
+    hjust = 0.5),
+    plot.subtitle = element_text(
+    size = 12,
+    face = "bold",
+    hjust = 0.5),
+  axis.text = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.title = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+   axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5)) +
+    scale_fill_manual(values=c("olivedrab", "coral4", "plum4")) +
+    scale_x_date(
+    date_labels = "%Y",  # Display only the year on the x-axis
+    date_breaks = "1 year",  # Set the interval for major tick marks to 1 year
+    limits = as.Date(c("2010-12-31", "2020-12-31"))  # Set the x-axis limits from 2017 to 2020
+  ) 
+  
+cladesyam_ke_plot <- cladesyam_ke_plot +
+geom_segment(aes(x = as.Date("2011-01-01"), xend = as.Date("2020-12-31"), y = 108, yend = 108, colour="red")) +
+annotate("text", x=as.Date("2016-01-01"), y=111, label="KCH study", size=3) +
+geom_segment(aes(x = as.Date("2020-01-01"), xend = as.Date("2020-12-31"), y = 102, yend = 102, colour="blue")) +
+annotate("text", x=as.Date("2020-01-01"), y=105, label="KHDSS study", hjust=0.3, size=3)
+
+cladesyam_ke_plot
+
+
+```
+
+
+```{r}
+# Read in the data
+clades_ug <- read.csv("~/Downloads/yam_clades_ug.csv", sep = ",", header=T)
+colnames(clades_ug) <- c("year", "clade")
+
+
+clades_ug_summary <- clades_ug %>%
+  mutate(date = as.Date(year),
+         year = lubridate::year(date),) %>%
+  group_by(year, clade) %>%
+  summarise(counts = n()) %>%
+  group_by(year) %>%
+  mutate(
+    percentages = counts / sum(counts) * 100
+  ) %>%
+  ungroup()
+
+# Create a new date column combining year and month for plotting
+clades_ug_summary$date <- as.Date(paste(clades_ug_summary$year, "01", "01", sep = "-"))
+
+# Plot the time series with months
+cladesyam_ug_plot <- ggplot(clades_ug_summary, aes(x = date, y = percentages, fill = clade)) +
+  geom_col(width=200, position = "stack", preserve="single") +
+  theme_classic() +
+    xlab("Influenza season") +
+    ylab("% of IBV clades") +
+    ggtitle("Uganda") +
+    theme_classic() +
+  
+  theme(panel.grid.major = element_blank(),
+    legend.position = "none",
+        legend.title = element_text(size = 14,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 12,
+    face = "bold",
+    hjust = 0.5),
+  axis.text = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.title = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+   axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5)) +
+    scale_fill_manual(values=c("coral4", "plum4")) +
+   scale_x_date(
+    date_labels = "%Y",  # Display only the year on the x-axis
+    date_breaks = "1 year",  # Set the interval for major tick marks to 1 year
+    limits = as.Date(c("2010-12-31", "2020-12-31"))  # Set the x-axis limits from 2017 to 2020
+  )
+  
+   
+
+
+cladesyam_ug_plot <- cladesyam_ug_plot +
+geom_segment(aes(x = as.Date("2016-12-31"), xend = as.Date("2020-01-01"), y = 108, yend = 108, colour="orangered2")) +
+annotate("text", x=as.Date("2019-01-01"), y=111, label="COAST study", size=3, hjust=0.7)
+
+
+
+```
+
+
+
+```{r}
+# Read in the data
+clades_gbl <- read.csv("~/Downloads/global_yam_clades.csv", sep = ",", header=T)
+colnames(clades_gbl) <- c("year", "clade")
+
+clades_gbl <- clades_gbl %>% separate(year, c("year", "month", "day"))
+clades_gbl <- subset(clades_gbl, year >= 2009 )
+clades_gbl <- clades_gbl %>% unite(year, c(year, month, day), sep = "-")
+
+clades_gbl_summary <- clades_gbl %>%
+  mutate(date = as.Date(year),
+         year = lubridate::year(date),) %>%
+  group_by(year, clade) %>%
+  summarise(counts = n()) %>%
+  group_by(year) %>%
+  mutate(
+    percentage = counts / sum(counts) * 100
+  ) %>%
+  ungroup()
+
+# Create a new date column combining year and month for plotting
+
+clades_gbl_summary$date <- as.Date(paste(clades_gbl_summary$year, "01", "01", sep = "-"))
+clades_gbl_summary <- subset(clades_gbl_summary, year >= 2011)
+new_row <- data.frame(
+  year = 2021,        # Use NA or specify the value for column1 in the new row
+  clade = "Y3",
+  counts = 0,
+  percentage = 0,# Specify the value for column2 in the new row
+  date = as.Date("2021-01-01")
+)
+clades_gbl_summary <- bind_rows(clades_gbl_summary, new_row)
+
+# Plot the time series with months
+
+clades_gblyam_plot <- ggplot(clades_gbl_summary, aes(x = date, y = percentage, fill = clade)) +
+  geom_col(width=200, position = "stack", preserve="single") +
+  theme_classic() +
+    xlab("Influenza season") +
+    ylab("% of IBV yamagata lineage clades") +
+   ggtitle("Globally") +
+    theme_classic() +
+  
+  theme(panel.grid.major = element_blank(),
+    legend.position = "bottom",
+        legend.title = element_text(size = 14,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 12,
+    face = "bold",
+    hjust = 0.5),
+  axis.text = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.title = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+   axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5)) +
+    scale_fill_manual(values=c("plum4","olivedrab","orangered4")) +
+  scale_x_date(breaks = seq(as.Date("2011-01-01"), as.Date("2021-12-31"), by="1 year"), date_labels = "%Y")
+
+
+
+clades_gblyam_plot
+
+```
+
+
+
+```{r}
+grid.arrange(cladesyam_ke_plot, cladesyam_ug_plot, clades_gblyam_plot, nrow=1)
+
+grid.arrange(arrangeGrob(clades_ke_plot, clades_ug_plot, clades_gbl_plot, cladesyam_ke_plot, cladesyam_ug_plot,clades_gblyam_plot,  ncol = 3), nrow=2)
+
+```
+
+
+
+```{r clade distribution for the local dataset}
+
+# Read in the nextclade metadata
+HAvic_nextclade_metadata <- read.csv("~/Desktop/flub_msc/results/nextclade/vic/nextclade (3)/nextclade.csv", sep = ";")
+HAyam_nextclade_metadata <- read.csv("~/Desktop/flub_msc/results/nextclade/yam/nextclade (4)/nextclade.csv", sep = ";")
+HA_nextclade_metadata <- bind_rows(HAvic_nextclade_metadata, HAyam_nextclade_metadata)
+
+write_csv(HAvic_nextclade_metadata, "~/Desktop/vicclade.csv")
+
+
+
+#Obtain the sample metadata only
+HA_sample_metadata <- HA_nextclade_metadata %>% filter(!grepl("^B/", seqName)) %>%
+                      separate(seqName, c("location","virus","sample_id","collection_date"), sep = "/") 
+
+HA_sample_metadata$collection_date <- parse_date_time(HA_sample_metadata$collection_date, orders = c('ymd', 'dmy'))
+
+HA_sample_metadata <- HA_sample_metadata %>% 
+                      separate(year, c("year"), sep = "-") 
+
+HA_clade_metadata <- HA_sample_metadata[,2:6]
+
+HA_clade_metadata <- HA_clade_metadata  %>% 
+             group_by(clade, location, year) %>%
+             summarise(counts = n())
+
+KU_clade_plot <- ggplot(HA_clade_metadata, aes(x=year, y=clade, size = counts))+
+    geom_point(alpha=1) +
+    scale_size(range = c(5, 10), name="Clade count")+
+    ylab("Clade count") +
+    xlab("Influenza seasons") +
+    theme_classic() +
+    theme(axis.text = element_text(size = 10,
+                                   colour = "black"),
+          axis.text.x = element_text(angle = 75, vjust = 0.5, hjust = 0.5))
+          
+KU_clade_plot + scale_x_discrete(labels=c("2011" = "2010/2011", "2012" = "2011/2012", 
+                              "2013" = "2012/2013", "2016" = "2015/2016","2017" = "2016/2017", "2018" = "2017/2018",
+                              "2019" = "2018/2019", "2020" = "2019/2020", "2021" = "2020/2021", "2022" = "2021/2022"))
+
+
+
+```
+
+
+
+```{r clade distribution for the global dataset}
+
+# Read in the nextclade metadata
+HAvic_nextclade_metadata <- read.csv("~/Desktop/Msc/flub_results/nextclade/vichatotal/nextclade.csv", sep = ";")
+HAyam_nextclade_metadata <- read.csv("~/Desktop/Msc/flub_results/nextclade/yamtotal/nextclade.csv", sep = ";")
+HA_nextclade_metadata <- bind_rows(HAvic_nextclade_metadata, HAyam_nextclade_metadata)
+
+
+#Obtain the sample metadata only
+HA_ref_metadata <- HA_nextclade_metadata %>% filter(grepl("^B/", seqName)) %>%
+                      separate(seqName, c("sample_id","location","segment","collection_date"), sep = "\\|") %>%
+                      separate(collection_date, c("year"), sep = "-")
+
+
+HA_clade_metadata <- HA_ref_metadata[,2:6]
+HA_clade_metadata <- HA_clade_metadata  %>% 
+             group_by(clade, location, year) %>%
+             summarise(counts = n())
+
+global_clade_plot <- ggplot(HA_clade_metadata, aes(x=year, y=clade, size = counts))+
+    geom_point(alpha=1) +
+    scale_size(range = c(5, 10), name="Clade count")+
+    theme_classic() +
+    theme(axis.text = element_text(size = 10,
+                                   colour = "black"))
+
+global_clade_plot
+
+```
+
+
+
+```{r lineage distribution plots}
+
+#Read in alignment data
+flub_aln <- readDNAStringSet("~/Desktop/flub_msc/results/mafft/HA_edit.fa")
+flub_labels <-  names(flub_aln)
+write(flub_labels, "~/Desktop/flub_msc/flub_labels.csv")
+
+
+# Read in the data
+lineages <- read.csv("~/Downloads/flub_labels_ke.csv", sep = ",", header=F)
+colnames(lineages) <- c("lineage", "year")
+
+# Convert Date to month-year format
+lineages$MonthYear <- as.Date(lineages$year)
+
+#Obtain counts of the various dates in the locations
+lineage_dis <- lineages %>% 
+             group_by(lineage,MonthYear) %>%
+             summarise(counts = n())
+             
+
+year_labels <- rep(c('J','F','M','A','M','J','J','A','S','O','N','D'),11)
+
+ggplot(lineages_summary, aes(x=MonthYear, y=percentage,fill=lineage)) +
+  
+  geom_col(width = 0.5, position = "stack") +
+
+  ylab("Virus positive") +
+  
+  xlab("")+
+  
+  ggtitle("Influenza B Virus positive isolates from Kenya and Uganda") +
+  
+  scale_fill_manual(values=c("steelblue4","salmon3")) +
+  
+  scale_x_date(date_labels=paste(year_labels, ifelse(year_labels == "F", "\n%Y", "")) ,date_breaks  ="1 month") +
+
+  theme_classic() +
+  
+  theme(panel.grid.major = element_blank(),
+    legend.position = "bottom",
+        legend.title = element_text(size = 12,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 12,
+    face = "bold",
+    hjust = 0.5),
+  axis.text = element_text(size = 10,
+    face = "bold",
+    colour="black"),
+  axis.title.y = element_text(size = 10,
+    face = "bold",
+    colour="black")) +
+  
+  scale_y_continuous(breaks=seq(0,100,10))
+
+
+
+
+#Obtain the sample metadata only
+lineages <- lineages %>% separate(year, c("year", "month", "day"), sep = "-")
+year <- c("2014","2015","2020", "2022")
+year <- as.data.frame(year)
+
+lineages <- bind_rows(lineages, year)
+lineages$lineage <- gsub("NA", "", lineages$lineage)
+
+
+lineages <- lineages  %>% 
+             group_by(lineage, year) %>%
+             summarise(counts = n()) %>%
+             mutate(percentage=counts/172 *100)
+
+lineage_dis_plot <- ggplot(lineages, aes(x=year, y=percentage, fill=lineage))+
+    geom_col() +
+    theme_classic() +
+    xlab("Influenza season") +
+    ylab("Lineage count") +
+    theme(axis.text = element_text(size = 10,
+                                   colour = "black"),
+          axis.text.x = element_text(angle = 75, vjust = 0.5, hjust = 0.5),
+          legend.position = "bottom") +
+    scale_fill_manual(values=c("steelblue4","salmon3"))
+   
+
+          
+lineage_dis_plot
+```
+
+
+
+```{r lineage distribution ke}
+
+# Read in the data
+lineages <- read.csv("~/Downloads/flub_labels_ke.csv", sep = ",", header=F)
+colnames(lineages) <- c("lineage", "year")
+
+
+lineages_summary <- lineages %>%
+  mutate(date = as.Date(year),
+         year = lubridate::year(date),) %>%
+  group_by(year, lineage) %>%
+  summarise(counts = n()) %>%
+  group_by(year) %>%
+  mutate(
+    percentages = counts / sum(counts) * 100
+  ) %>%
+  ungroup()
+
+# Create a new date column combining year and month for plotting
+lineages_summary$date <- as.Date(paste(lineages_summary$year, "01", "01", sep = "-"))
+
+# Plot the time series with months
+ke_plot <- ggplot(lineages_summary, aes(x = date, y = percentages, fill = lineage)) +
+  geom_col(width=200, position = "stack", preserve="single") +
+  theme_classic() +
+    xlab("Influenza season") +
+    ylab("% of IBV strains by lineage") +
+    ggtitle("IBV Lineage distribution", subtitle = "Kenya") +
+    theme_classic() +
+  
+  theme(panel.grid.major = element_blank(),
+    legend.position = "none",
+        legend.title = element_text(size = 14,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 14,
+    face = "bold",
+    hjust = 0.5),
+    plot.subtitle = element_text(
+    size = 12,
+    face = "bold",
+    hjust = 0.5),
+  axis.text = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.title = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+   axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5)) +
+    scale_fill_manual(values=c("steelblue4","sienna4")) +
+  scale_x_date(date_labels =paste("%Y") ,date_breaks  ="1 year")
+
+
+
+ke_plot <- ke_plot +
+geom_segment(aes(x = as.Date("2011-01-01"), xend = as.Date("2021-01-01"), y = 108, yend = 108, colour="red")) +
+annotate("text", x=as.Date("2016-01-01"), y=111, label="KCH study", size=3) +
+geom_segment(aes(x = as.Date("2020-01-01"), xend = as.Date("2021-01-01"), y = 102, yend = 102, colour="blue")) +
+annotate("text", x=as.Date("2020-01-01"), y=105, label="KHDSS study", hjust=0.3, size=3)
+
+
+```
+
+
+
+```{r lineage distribution ug}
+# Read in the data
+ug_lineages <- read.csv("~/Downloads/flub_labels_ug.csv", sep = ",", header=T)
+colnames(ug_lineages) <- c("lineage", "year")
+
+
+ug_lineages_summary <- ug_lineages %>%
+  mutate(date = as.Date(year),
+         year = lubridate::year(date),) %>%
+  group_by(year, lineage) %>%
+  summarise(counts = n()) %>%
+  group_by(year) %>%
+  mutate(
+    percentages = counts / sum(counts) * 100
+  ) %>%
+  ungroup()
+
+# Create a new date column combining year and month for plotting
+ug_lineages_summary$date <- as.Date(paste(ug_lineages_summary$year, "01", "01", sep = "-"))
+
+# Plot the time series with months
+ug_plot <-  ggplot(ug_lineages_summary, aes(x = date, y = percentages, fill = lineage)) +
+  geom_col(width=200, position = "stack", preserve="single") +
+  theme_classic() +
+    xlab("Influenza season") +
+    ylab("% of IBV strains by lineage") +
+    ggtitle("Uganda") +
+    theme_classic() +
+  
+  theme(panel.grid.major = element_blank(),
+    legend.position = "none",
+        legend.title = element_text(size = 14,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 14,
+    face = "bold",
+    hjust = 0.5),
+  axis.text = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.title = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5)) +
+    scale_fill_manual(values=c("steelblue4","sienna4")) +
+ scale_x_date(
+    date_labels = "%Y",  # Display only the year on the x-axis
+    date_breaks = "1 year",  # Set the interval for major tick marks to 1 year
+    limits = as.Date(c("2010-12-31", "2020-12-31"))  # Set the x-axis limits from 2017 to 2020
+  )
+
+ug_plot <- ug_plot +
+geom_segment(aes(x = as.Date("2016-12-31"), xend = as.Date("2020-01-01"), y = 108, yend = 108, colour="orangered2")) +
+annotate("text", x=as.Date("2019-01-01"), y=111, label="COAST study", size=3, hjust=0.7)
+
+
+```
+
+
+
+```{r global lineage distribution plot}
+
+# Read in the data
+global_lineages <- read.csv("~/Downloads/labels_global_edited.csv", sep = ",", header=T)
+colnames(global_lineages) <- c("lineage", "year")
+
+typeof(global_lineages$year)
+
+global_lineages <- global_lineages %>% separate(year, c("year", "month", "day"))
+global_lineages <- subset(global_lineages, year >= 2011 & year <= 2021)
+global_lineages <- global_lineages %>% unite(year, c(year, month, day), sep = "-")
+
+
+global_lineages_summary <- global_lineages %>%
+  mutate(date = as.Date(year),
+         year = lubridate::year(date),) %>%
+  group_by(year, lineage) %>%
+  summarise(counts = n()) %>%
+  group_by(year) %>%
+  mutate(
+    percentages = counts / sum(counts) * 100
+  ) %>%
+  ungroup()
+
+
+# Create a new date column combining year and month for plotting
+global_lineages_summary$date <- as.Date(paste(global_lineages_summary$year, "01", "01", sep = "-"))
+
+# Plot the time series with months
+global_plot <-  ggplot(global_lineages_summary, aes(x = date, y = percentages, fill = lineage)) +
+  geom_col(width= 200, position = "stack") +
+  theme_classic() +
+    xlab("Influenza season") +
+    ylab("% of IBV strains by lineage") +
+    ggtitle("Globally") +
+    theme_classic() +
+  
+  theme(panel.grid.major = element_blank(),
+    legend.position = "bottom",
+        legend.title = element_text(size = 14,
+    face = "bold",
+    hjust = 0.5),
+        plot.title = element_text(
+    size = 12,
+    face = "bold",
+    hjust = 0.5),
+  axis.text = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.title = element_text(size = 14,
+    face = "bold",
+    colour="black"),
+  axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5)) +
+    scale_fill_manual(values=c("steelblue4","sienna4")) +
+ scale_x_date(breaks = seq(as.Date("2009-01-01"), as.Date("2023-12-31"), by="1 year"), date_labels = "%Y")
+
+
+global_plot
+
+```
+
+
+
+```{r}
+
+library(patchwork)
+
+ke_plot + ug_plot + global_plot +
+  plot_layout(ncol = 3, nrow = 1, guides = "collect") &
+  theme(legend.position='bottom')
+
+
+?plot_layout
+
+
+grid_arrange_shared_legend(ke_plot, ug_plot, global_plot, nrow=1)
+
+jpeg("~/Desktop/lineage_plots.jpeg",units = "in",width = 14,height = 5,res = 600)
+ke_plot + ug_plot + global_plot +
+  plot_layout(ncol = 3, nrow = 1) 
+dev.off()
+graphics.off()
+
+
+jpeg("~/Desktop/vicclade_plots.jpeg",units = "in",width = 14,height = 5,res = 600)
+clades_ke_plot + theme(legend.position = "none") +
+  clades_ug_plot + clades_gbl_plot+
+  plot_layout(ncol = 3, nrow = 1) 
+dev.off()
+graphics.off()
+
+jpeg("~/Desktop/yamclade_plots.jpeg",units = "in",width = 14,height = 5,res = 600)
+cladesyam_ke_plot+ cladesyam_ug_plot+ clades_gblyam_plot +
+  plot_layout(ncol = 3, nrow = 1) 
+dev.off()
+graphics.off()
+
+
+jpeg("~/Desktop/vicclade_plots.jpeg",units = "in",width = 14,height = 5,res = 600)
+grid.arrange(clades_ke_plot, clades_ug_plot, clades_gbl_plot,nrow=1)
+dev.off()
+graphics.off()
+
+jpeg("~/Desktop/yamclade_plots.jpeg",units = "in",width = 14,height = 7,res = 600)
+grid.arrange(cladesyam_ke_plot, cladesyam_ug_plot, clades_gblyam_plot, nrow=1)
+dev.off()
+graphics.off()
+
+
+grid.arrange(clades_ke_plot, cladesyam_ke_plot, cladesyam_ug_plot, clades_gblyam_plot, nrow=1)
+
+
+?plot_layout
+```
+
+
+
+```{r  victoria clade distribution per continent}
+
+vic_gbl <- read.csv("~/Desktop/flub_msc/global/results/nextclade/HA_vicgbl_nextclade.csv", sep = ";")
+vic_gbl <- cbind(vic_gbl$seqName, vic_gbl$clade)
+vic_gbl <- as.data.frame(vic_gbl)
+colnames(vic_gbl) <- c("seqname", "clade")
+vic_gbl <- vic_gbl[18:3027, ]
+vic_gbl_V1A <- vic_gbl %>% separate(seqname, c("subtype", "country", "isolate_id"), sep = "/") %>%
+                       filter(clade == "V1A.3a.2")
+
+
+vic_gbl_V1A <- merge(vic_gbl_V1A, vic_gbl_mdata %>% select('isolate_id','country'), by="isolate_id", all.x=TRUE)
+
+vic_gbl_V1A <- vic_gbl_V1A %>% group_by(country.y, clade) %>%
+              summarise(counts=n())
+              
+              
+```
+
+
+```{r yamagata clade distribution per continent}
+
+yam_gbl_mdata <- read.csv("~/Desktop/flub_msc/global/DOCS/yam_global_metadata.csv")
+yam_gbl <- read.csv("~/Desktop/flub_msc/global/results/nextclade/HA_yamgbl_nextclade.csv", sep = ";")
+yam_gbl <- cbind(yam_gbl$seqName, yam_gbl$clade)
+yam_gbl <- as.data.frame(yam_gbl)
+colnames(yam_gbl) <- c("seqname", "clade")
+yam_gbl <- yam_gbl[13:2165, ]
+yam_gbl_V1A <- yam_gbl %>% separate(seqname, c("subtype", "country", "isolate_id"), sep = "/") %>%
+                       filter(clade == "Y3")
+
+
+yam_gbl_V1A <- merge(yam_gbl_V1A, yam_gbl_mdata %>% select('isolate_id','country'), by="isolate_id", all.x=TRUE)
+
+yam_gbl_V1A <- yam_gbl_V1A %>% group_by(country.y, clade) %>%
+              summarise(counts=n())
+
+
+```
+

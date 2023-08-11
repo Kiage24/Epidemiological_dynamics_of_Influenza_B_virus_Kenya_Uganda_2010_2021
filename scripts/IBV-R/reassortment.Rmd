@@ -1,0 +1,156 @@
+---
+title: "reassortment"
+author: "Brenda_Kiage"
+date: "2023-06-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+```{r Load required libraries}
+
+library(ggtree)
+library(ape)
+library(dendextend)
+
+
+```
+
+
+```{r Read in the newick treefiles}
+
+HA_tree <- read.tree("~/Desktop/Msc/flub_results/iqtree/HA_tree1.nwk")
+NS_tree <- read.tree("~/Desktop/Msc/flub_results/iqtree/NS_tree.nwk")
+
+```
+
+```{r Convert the trees to ultrametric}
+
+HA_tree <- force.ultrametric(HA_tree)
+NS_tree <- force.ultrametric(NS_tree)
+
+```
+```{r # Convert ultrametric tree to hclust object}
+
+HA_hclust_tree <- as.hclust.phylo(HA_tree)
+NS_hclust_tree <- as.hclust.phylo(NS_tree)
+
+```
+
+
+```{r Construct the dendogram}
+
+HA_dendro <- as.dendrogram(HA_hclust_tree)
+NS_dendro <- as.dendrogram(NS_hclust_tree)
+
+
+# Create a list to hold dendrograms
+dend_list <- dendlist(HA_dendro, NS_dendro) 
+
+HANS <- tanglegram(dend_list,
+                   highlight_distinct_edges = FALSE, # Turn-off dashed lines
+                   common_subtrees_color_lines = FALSE, # Turn-off line colors
+                   common_subtrees_color_branches = FALSE,
+                   lwd = 1,
+                   lty = 2,
+                   edge.lwd = 2,
+                   lab.cex = 0.4,
+                   #label_offset = 0.5,
+                   #seg.len = 0.5,
+                   k_branches = 2,
+                   main_left = "HA",
+                   main_right = "NS",
+                   cex_main_left = 2,
+                   cex_main_right = 2
+)
+
+HANS
+
+
+
+```
+
+```{r plot tanglegrams to check for reassortment}
+
+
+consensus_ultra <- chronos(HA_tree, lambda=0)
+
+# Convert tree to ultrametric tree
+leaf_distances <- cophenetic(HA_tree)
+node_distances <- node.depth(HA_tree)
+for (i in 1:HA_tree$Nnode) {
+  if (!isTip(HA_tree, i)) {
+    left_child <- HA_tree$edge[i,1]
+    right_child <- HA_tree$edge[i,2]
+    left_length <- leaf_distances[left_child] - node_distances[i]
+    right_length <- leaf_distances[right_child] - node_distances[i]
+    new_length <- mean(c(left_length, right_length))
+    HA_tree$edge[i,3] <- node_distances[i] + new_length
+  }
+}
+
+# Convert tree to ultrametric tree
+leaf_distances <- cophenetic(NA_tree)
+node_distances <- node.depth(NA_tree)
+for (i in 1:NA_tree$Nnode) {
+  if (!isTip(NA_tree, i)) {
+    left_child <- NA_tree$edge[i,1]
+    right_child <- NA_tree$edge[i,2]
+    left_length <- leaf_distances[left_child] - node_distances[i]
+    right_length <- leaf_distances[right_child] - node_distances[i]
+    new_length <- mean(c(left_length, right_length))
+    NA_tree$edge[i,3] <- node_distances[i] + new_length
+  }
+}
+
+# Convert ultrametric tree to hclust object
+HA_tree <- force.ultrametric(HA_tree)
+HA_hclust_tree <- as.hclust.phylo(HA_tree)
+
+
+
+NS_tree <- force.ultrametric(NS_tree)
+NS_hclust_tree <- as.hclust.phylo(NS_tree)
+
+
+
+#Construct the dendogram
+HA_dendro <- as.dendrogram(HA_hclust_tree)
+NS_dendro <- as.dendrogram(NS_hclust_tree)
+
+
+
+
+HANS <- tanglegram(HA_dendro, NS_dendro,
+                   highlight_distinct_edges = FALSE, # Turn-off dashed lines
+                   common_subtrees_color_lines = FALSE, # Turn-off line colors
+                   common_subtrees_color_branches = TRUE,
+                   lwd = 1,
+                   lty = 2,
+                   edge.lwd = 2,
+                   lab.cex = 0.4,
+                   #label_offset = 0.5,
+                   #seg.len = 0.5,
+                   k_branches = 2,
+                   main_left = "HA",
+                   main_right = "NS",
+                   cex_main_left = 2,
+                   cex_main_right = 2
+)
+
+HANS
+
+```
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
