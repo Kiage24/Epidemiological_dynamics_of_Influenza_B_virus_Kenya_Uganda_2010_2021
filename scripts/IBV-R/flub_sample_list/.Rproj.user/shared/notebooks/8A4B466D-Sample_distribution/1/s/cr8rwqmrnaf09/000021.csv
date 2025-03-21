@@ -1,5 +1,0 @@
-"0","flubs <- subset(flubs, select = -c(Day, sample_id))
-"
-"2","Error in eval(substitute(select), nl, parent.frame()) : 
-  object 'Day' not found
-"
